@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
@@ -13,8 +12,8 @@ const Home = () => {
       {
         id: 1,
         username: "elonmusk",
-  const location = useLocation();
         displayName: "Elon Musk",
+  const location = useLocation();
         avatar: "https://images.unsplash.com/photo-1590086782957-93c06ef21604?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
         verified: true,
         content: "Excited to announce our new rocket launch tomorrow! 🚀",
@@ -59,6 +58,8 @@ const Home = () => {
       }
     ];
   });
+  
+  const location = useLocation();
   
   const [activeTab, setActiveTab] = useState('for-you');
   
@@ -135,7 +136,7 @@ const Home = () => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-    
+
     if (diffInSeconds < 60) {
       return `${diffInSeconds}s`;
     } else if (diffInSeconds < 3600) {
@@ -176,10 +177,18 @@ const Home = () => {
               <UserIcon className="h-6 w-6" />
               <span className="hidden xl:block ml-4">Profile</span>
             </Link>
-            <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+            <Link 
+              to="/settings"
+              className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors"
+              aria-label="Settings"
+            >
               <SettingsIcon className="h-6 w-6" />
               <span className="hidden xl:block ml-4">Settings</span>
-            </button>
+            </Link>
+          </nav>
+          <button className="mt-6 btn-primary w-full">
+            <span className="hidden xl:inline">Chirp</span>
+            <span className="xl:hidden">+</span>
           </nav>
         </div>
           <button className="mt-6 btn-primary w-full">
@@ -433,18 +442,6 @@ const Home = () => {
                 <div className="flex-1">
                   <div className="flex items-center">
                     <span className="font-bold text-sm">John Smith</span>
-        <Link 
-          to="/settings"
-          className="mt-auto w-full"
-        >
-          <button 
-            className={`flex w-full p-2 lg:p-3 rounded-full items-center transition-all ${location.pathname === '/settings' ? 'bg-primary text-white' : 'text-surface-900 dark:text-surface-50 hover:bg-surface-200 dark:hover:bg-surface-700'}`}
-            aria-label="Settings"
-          >
-            <SettingsIcon className="h-7 w-7" />
-            <span className="hidden lg:block ml-4 text-lg font-medium">Settings</span>
-          </button>
-        </Link>
             Show more
           </button>
         </section>
