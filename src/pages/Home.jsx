@@ -218,22 +218,22 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
                   <div className="flex items-center justify-between mt-2 text-surface-500">
                     <button className="flex items-center hover:text-primary">
                       <span className="sr-only">Reply</span>
-                      {getIcon('MessageCircle')({ className: "w-5 h-5 mr-1" })}
+                      <span className="w-5 h-5 mr-1">{React.createElement(getIcon('MessageCircle'), { className: "w-5 h-5 mr-1" })}</span>
                       <span>{Math.floor(Math.random() * 50)}</span>
                     </button>
                     <button className="flex items-center hover:text-green-500">
                       <span className="sr-only">Rechirp</span>
-                      {getIcon('Repeat')({ className: "w-5 h-5 mr-1" })}
+                      <span className="w-5 h-5 mr-1">{React.createElement(getIcon('Repeat'), { className: "w-5 h-5 mr-1" })}</span>
                       <span>{Math.floor(Math.random() * 100)}</span>
                     </button>
                     <button className="flex items-center hover:text-accent">
                       <span className="sr-only">Like</span>
-                      {getIcon('Heart')({ className: "w-5 h-5 mr-1" })}
+                      <span className="w-5 h-5 mr-1">{React.createElement(getIcon('Heart'), { className: "w-5 h-5 mr-1" })}</span>
                       <span>{Math.floor(Math.random() * 1000)}</span>
                     </button>
                     <button className="flex items-center hover:text-primary">
                       <span className="sr-only">Share</span>
-                      {getIcon('Share')({ className: "w-5 h-5 mr-1" })}
+                      <span className="w-5 h-5 mr-1">{React.createElement(getIcon('Share'), { className: "w-5 h-5 mr-1" })}</span>
                     </button>
                   </div>
                 </div>
@@ -248,7 +248,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         {/* Search */}
         <div className="relative mb-6">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            {getIcon('Search')({ className: "w-5 h-5 text-surface-400" })}
+            {React.createElement(getIcon('Search'), { className: "w-5 h-5 text-surface-400" })}
           </div>
           <input 
             type="search"
