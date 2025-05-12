@@ -8,6 +8,7 @@ import Notifications from './pages/Notifications';
 import ChatPage from './pages/ChatPage';
 import SavedItems from './pages/SavedItems';
 import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import NotFound from './pages/NotFound';
 import getIcon from './utils/iconUtils';
 
@@ -66,6 +67,7 @@ function App() {
         <Route path="/chats" element={<ChatPage />} />
         <Route path="/saved" element={<SavedItems />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       

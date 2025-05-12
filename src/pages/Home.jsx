@@ -162,7 +162,7 @@ const Home = () => {
             <HomeIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Home</span>
           </button>
-          
+              <Link to="/settings" className="flex items-center w-full p-3 text-left transition-colors rounded-xl hover:bg-surface-200 dark:hover:bg-surface-800">
           <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <SearchIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Explore</span>
@@ -170,7 +170,7 @@ const Home = () => {
 
           <Link to="/notifications" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors relative">
             <BellIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Notifications</span>
+              </Link>
             <span className="absolute -top-1 -right-1 xl:top-2 xl:right-auto xl:left-7 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               3</span>
           </Link>
