@@ -187,11 +187,7 @@ const Home = () => {
           </nav>
           <button className="mt-6 btn-primary w-full">
             <span className="hidden xl:inline">Chirp</span>
-          </nav>
-        </div>
-          <button className="mt-6 btn-primary w-full">
-          <span className="hidden xl:inline">Chirp</span>
-          <span className="xl:hidden">+</span>
+            <span className="xl:hidden">+</span>
         </button>
         
         <div className="mt-auto flex items-center p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 cursor-pointer">
