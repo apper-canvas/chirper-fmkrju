@@ -168,9 +168,11 @@ const Home = () => {
             <span className="hidden xl:block ml-4">Explore</span>
           </Link>
 
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+          <Link to="/notifications" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors relative">
             <BellIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Notifications</span>
+            <span className="absolute -top-1 -right-1 xl:top-2 xl:right-auto xl:left-7 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              3</span>
           </button>
           
           <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
@@ -480,9 +482,11 @@ const Home = () => {
         <Link to="/search" className="p-2">
           <SearchIcon className="w-6 h-6" />
         </Link>
-        <button className="p-2">
+        <Link to="/notifications" className="p-2 relative">
           <BellIcon className="w-6 h-6" />
-        </button>
+          <span className="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            3</span>
+        </Link>
         <button className="p-2">
           <MessageCircleIcon className="w-6 h-6" />
         </button>
