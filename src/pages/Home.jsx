@@ -142,7 +142,6 @@ const Home = () => {
             <nav className="flex-1 px-2 mt-2">
       return `${Math.floor(diffInSeconds / 3600)}h`;
     } else {
-      return format(date, 'MMM d');
     }
   };
               <Link to="/search" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Search">
@@ -150,51 +149,42 @@ const Home = () => {
     <div className="relative flex min-h-screen">
       {/* Left Sidebar */}
       <aside className="hidden sm:flex flex-col w-20 xl:w-64 p-4 sticky top-0 h-screen border-r border-surface-200 dark:border-surface-700">
-              <Link to="/notifications" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Notifications">
-                <BellIcon className="h-6 w-6" />
-                <span className="ml-4 text-xl hidden xl:block">Notifications</span>
+        <div>
+          <nav className="flex-1 px-2 mt-2">
+            <button className="flex items-center justify-center xl:justify-start p-3 rounded-full text-primary bg-primary/10 font-medium">
+              <HomeIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Home</span>
+            </button>
+            <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              <SearchIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Explore</span>
+            </Link>
+            <Link to="/notifications" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors relative">
+              <BellIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Notifications</span>
+              <span className="absolute -top-1 -right-1 xl:top-2 xl:right-auto xl:left-7 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                3
+              </span>
+            </Link>
+            <Link to="/chats" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              <MessageCircleIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Messages</span>
+            </Link>
+            <Link to="/saved" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              <BookmarkIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Bookmarks</span>
+            </Link>
+            <Link to="/profile" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              <UserIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Profile</span>
+            </Link>
+            <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              <SettingsIcon className="h-6 w-6" />
+              <span className="hidden xl:block ml-4">Settings</span>
+            </button>
+          </nav>
         </div>
-        
-              <Link to="/chats" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Messages">
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full text-primary bg-primary/10 font-medium">
-            <HomeIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Home</span>
-          </button>
-              <Link to="/saved" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Saved">
-          <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
-            <SearchIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Explore</span>
-          </Link>
-              <Link to="/profile" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Profile">
-          <Link to="/notifications" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors relative">
-            <BellIcon className="h-6 w-6" />
-              </Link>
-            <span className="absolute -top-1 -right-1 xl:top-2 xl:right-auto xl:left-7 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              <Link to="/settings" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Settings">
-          </Link>
-          
-              </Link>
-            <MessageCircleIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Messages</span>
-          </Link>
-          
-          <Link to="/saved" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
-            <BookmarkIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Bookmarks</span>
-          </Link>
-          
-          <Link to="/profile" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
-            <UserIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Profile</span>
-          </Link>
-          
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
-            <SettingsIcon className="h-6 w-6" />
-            <span className="hidden xl:block ml-4">Settings</span>
-          </button>
-        </nav>
-        
-        <button className="mt-6 btn-primary w-full">
+          <button className="mt-6 btn-primary w-full">
           <span className="hidden xl:inline">Chirp</span>
           <span className="xl:hidden">+</span>
         </button>
