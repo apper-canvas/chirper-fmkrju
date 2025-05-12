@@ -139,12 +139,9 @@ const Home = () => {
       return `${diffInSeconds}s`;
     } else if (diffInSeconds < 3600) {
       return `${Math.floor(diffInSeconds / 60)}m`;
-            <nav className="flex-1 px-2 mt-2">
-      return `${Math.floor(diffInSeconds / 3600)}h`;
-    } else {
-    }
+    } else return `${Math.floor(diffInSeconds / 3600)}h`;
   };
-              <Link to="/search" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Search">
+
   return (
     <div className="relative flex min-h-screen">
       {/* Left Sidebar */}
