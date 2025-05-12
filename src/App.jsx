@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import Home from './pages/Home';
+import Search from './pages/Search';
 import NotFound from './pages/NotFound';
 import getIcon from './utils/iconUtils';
 
@@ -56,6 +57,7 @@ function App() {
       
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
@@ -162,11 +163,11 @@ const Home = () => {
             <span className="hidden xl:block ml-4">Home</span>
           </button>
           
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+          <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <SearchIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Explore</span>
-          </button>
-          
+          </Link>
+
           <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <BellIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Notifications</span>
@@ -476,9 +477,9 @@ const Home = () => {
         <button className="p-2">
           <HomeIcon className="w-6 h-6 text-primary" />
         </button>
-        <button className="p-2">
+        <Link to="/search" className="p-2">
           <SearchIcon className="w-6 h-6" />
-        </button>
+        </Link>
         <button className="p-2">
           <BellIcon className="w-6 h-6" />
         </button>
