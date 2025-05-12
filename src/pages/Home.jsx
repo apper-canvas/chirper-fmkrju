@@ -13,7 +13,6 @@ const Home = () => {
         id: 1,
         username: "elonmusk",
         displayName: "Elon Musk",
-  const location = useLocation();
         avatar: "https://images.unsplash.com/photo-1590086782957-93c06ef21604?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
         verified: true,
         content: "Excited to announce our new rocket launch tomorrow! 🚀",
@@ -188,7 +187,6 @@ const Home = () => {
           </nav>
           <button className="mt-6 btn-primary w-full">
             <span className="hidden xl:inline">Chirp</span>
-            <span className="xl:hidden">+</span>
           </nav>
         </div>
           <button className="mt-6 btn-primary w-full">
@@ -442,6 +440,14 @@ const Home = () => {
                 <div className="flex-1">
                   <div className="flex items-center">
                     <span className="font-bold text-sm">John Smith</span>
+                  </div>
+                  <div className="text-surface-500 text-sm">@johnsmith</div>
+                </div>
+                <button className="btn-primary text-sm py-1.5">Follow</button>
+              </div>
+            </div>
+          </div>
+          <button className="p-4 text-primary hover:bg-surface-200 dark:hover:bg-surface-700/50 transition-colors w-full text-left">
             Show more
           </button>
         </section>
