@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MainFeature from '../components/MainFeature';
@@ -144,7 +145,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
 
         <nav className="flex-1 w-full">
           <ul className="space-y-1">
-            {navItems.map((item) => (
+function Home() {
               <li key={item.name}>
                 <a
                   href={item.path}
@@ -196,7 +197,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
                   <div className="flex items-center">
                     <span className="font-bold mr-1">User Name</span>
                     {i % 2 === 0 && (
-                      <VerifiedIcon className="text-primary w-4 h-4" />
+                {getIcon("Plus", true)}
                     )}
                     <span className="text-surface-500 dark:text-surface-400 ml-1">@username · 2h</span>
                     <button className="ml-auto p-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
@@ -255,11 +256,11 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
             placeholder="Search chirps"
             className="input-field pl-10 bg-surface-100 dark:bg-surface-800"
           />
-        </div>
-        
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                {getIcon("Search", false)}
         {/* Trending */}
         <div className="card mb-6">
-          <h2 className="text-xl font-bold mb-4">Trending</h2>
+                className="w-full py-3 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           <div className="space-y-4">
             {trendingTopics.map((topic, index) => (
               <div 
@@ -268,18 +269,18 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
               >
                 <div>
                   <div className="font-bold">{topic.tag}</div>
-                  <div className="text-sm text-surface-500 dark:text-surface-400">{topic.chirps} chirps</div>
-                </div>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl mb-4">
+              <h2 className="px-4 py-3 text-xl font-bold">Trends for you</h2>
                 <MoreHorizontalIcon className="w-5 h-5 text-surface-400" />
-              </div>
-            ))}
-            <a href="/trends" className="block text-primary hover:underline p-2">
-              Show more
+                <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" key={index}>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Trending {topic.category}</span>
+                    <DotsThreeOutline className="text-gray-500" size={20} />
             </a>
-          </div>
-        </div>
+                  <p className="font-bold">{topic.name}</p>
+                  <span className="text-sm text-gray-500">{topic.chirps} chirps</span>
         
-        {/* Who to follow */}
+              ))}
         <div className="card">
           <h2 className="text-xl font-bold mb-4">Who to follow</h2>
           <div className="space-y-4">
@@ -311,12 +312,5 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
             <a href="/suggestions" className="block text-primary hover:underline p-2">
               Show more
             </a>
-          </div>
-          <MoreHorizontalIcon className="hidden xl:block w-5 h-5 ml-auto" />
-        </div>
-      </aside>
-    </div>
-  );
-}
 
 export default Home;
