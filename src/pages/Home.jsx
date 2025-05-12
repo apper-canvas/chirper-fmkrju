@@ -139,43 +139,41 @@ const Home = () => {
       return `${diffInSeconds}s`;
     } else if (diffInSeconds < 3600) {
       return `${Math.floor(diffInSeconds / 60)}m`;
-    } else if (diffInSeconds < 86400) {
+            <nav className="flex-1 px-2 mt-2">
       return `${Math.floor(diffInSeconds / 3600)}h`;
     } else {
       return format(date, 'MMM d');
     }
   };
-
+              <Link to="/search" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Search">
   return (
     <div className="relative flex min-h-screen">
       {/* Left Sidebar */}
       <aside className="hidden sm:flex flex-col w-20 xl:w-64 p-4 sticky top-0 h-screen border-r border-surface-200 dark:border-surface-700">
-        <div className="flex items-center justify-center xl:justify-start mb-6">
-          <svg className="w-10 h-10 text-primary" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path>
-          </svg>
-          <span className="hidden xl:block text-xl font-bold ml-2">Chirper</span>
+              <Link to="/notifications" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Notifications">
+                <BellIcon className="h-6 w-6" />
+                <span className="ml-4 text-xl hidden xl:block">Notifications</span>
         </div>
         
-        <nav className="mt-4 flex flex-col space-y-2">
+              <Link to="/chats" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Messages">
           <button className="flex items-center justify-center xl:justify-start p-3 rounded-full text-primary bg-primary/10 font-medium">
             <HomeIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Home</span>
           </button>
-              <Link to="/settings" className="flex items-center w-full p-3 text-left transition-colors rounded-xl hover:bg-surface-200 dark:hover:bg-surface-800">
+              <Link to="/saved" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Saved">
           <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <SearchIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Explore</span>
           </Link>
-
+              <Link to="/profile" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Profile">
           <Link to="/notifications" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors relative">
             <BellIcon className="h-6 w-6" />
               </Link>
             <span className="absolute -top-1 -right-1 xl:top-2 xl:right-auto xl:left-7 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3</span>
+              <Link to="/settings" className="flex items-center p-3 mb-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800" aria-label="Settings">
           </Link>
           
-          <Link to="/chats" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+              </Link>
             <MessageCircleIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Messages</span>
           </Link>
