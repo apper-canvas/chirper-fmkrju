@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -13,6 +13,7 @@ const Home = () => {
       {
         id: 1,
         username: "elonmusk",
+  const location = useLocation();
         displayName: "Elon Musk",
         avatar: "https://images.unsplash.com/photo-1590086782957-93c06ef21604?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
         verified: true,
@@ -432,15 +433,18 @@ const Home = () => {
                 <div className="flex-1">
                   <div className="flex items-center">
                     <span className="font-bold text-sm">John Smith</span>
-                  </div>
-                  <div className="text-surface-500 text-sm">@johnsmith</div>
-                </div>
-                <button className="btn-primary text-sm py-1.5">Follow</button>
-              </div>
-            </div>
-          </div>
-          
-          <button className="p-4 text-primary hover:bg-surface-200 dark:hover:bg-surface-700/50 transition-colors w-full text-left">
+        <Link 
+          to="/settings"
+          className="mt-auto w-full"
+        >
+          <button 
+            className={`flex w-full p-2 lg:p-3 rounded-full items-center transition-all ${location.pathname === '/settings' ? 'bg-primary text-white' : 'text-surface-900 dark:text-surface-50 hover:bg-surface-200 dark:hover:bg-surface-700'}`}
+            aria-label="Settings"
+          >
+            <SettingsIcon className="h-7 w-7" />
+            <span className="hidden lg:block ml-4 text-lg font-medium">Settings</span>
+          </button>
+        </Link>
             Show more
           </button>
         </section>
