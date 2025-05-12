@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
@@ -185,12 +186,13 @@ const Home = () => {
               <span className="hidden xl:block ml-4">Settings</span>
             </Link>
           </nav>
+          
           <button className="mt-6 btn-primary w-full">
             <span className="hidden xl:inline">Chirp</span>
             <span className="xl:hidden">+</span>
-        </button>
+          </button>
         
-        <div className="mt-auto flex items-center p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 cursor-pointer">
+          <div className="mt-auto flex items-center p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 cursor-pointer">
           <img 
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" 
             alt="Profile" 
@@ -201,6 +203,7 @@ const Home = () => {
             <p className="text-surface-500 text-xs">@yourusername</p>
           </div>
           <MoreHorizontalIcon className="hidden xl:block w-5 h-5 ml-auto" />
+        </div>
         </div>
       </aside>
       
