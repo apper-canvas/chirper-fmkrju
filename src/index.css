@@ -46,6 +46,10 @@
     @apply bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 transition-all duration-200;
   }
   
+  .nav-button {
+    @apply p-3 h-12 w-12 flex items-center justify-center rounded-full text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors duration-200;
+  }
+  
   .chirp-item {
     @apply border-b border-surface-200 dark:border-surface-700 p-4 hover:bg-surface-100 dark:hover:bg-surface-800/80 transition-colors duration-200;
   }
