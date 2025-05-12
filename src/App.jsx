@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Notifications from './pages/Notifications';
+import ChatPage from './pages/ChatPage';
 import NotFound from './pages/NotFound';
 import getIcon from './utils/iconUtils';
 
@@ -60,6 +61,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/chats" element={<ChatPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       
