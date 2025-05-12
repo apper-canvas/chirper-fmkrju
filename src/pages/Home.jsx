@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
-
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showCreateModal, setShowCreateModal] = useState(false);
 const Home = () => {
-  const [chirps, setChirps] = useState(() => {
     const savedChirps = localStorage.getItem('chirps');
     return savedChirps ? JSON.parse(savedChirps) : [
       {
@@ -77,6 +78,16 @@ const Home = () => {
       content: chirpContent,
       timestamp: new Date().toISOString(),
       likes: 0,
+  const handleOpenCreateModal = () => {
+    setShowCreateModal(true);
+  };
+  
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+  
+  const isActive = path => location.pathname === path;
+  
       rechirps: 0,
       replies: 0,
       views: "0",
@@ -86,65 +97,76 @@ const Home = () => {
     
     setChirps([newChirp, ...chirps]);
     toast.success("Your chirp was posted!");
-  };
+              <img src="/chirper-logo.svg" alt="chirper" className="w-8 h-8" />
 
   const handleLike = (id) => {
     setChirps(chirps.map(chirp => {
-      if (chirp.id === id) {
-        const isLiked = !chirp.isLiked;
+            <Link to="/" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
         return {
           ...chirp,
           likes: chirp.likes + (isLiked ? 1 : -1),
-          isLiked
-        };
+              <span className="hidden xl:inline ml-4">Home</span>
+            </Link>
       }
-      return chirp;
-    }));
+            <Link to="/search" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/search') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
   };
 
   const handleRechirp = (id) => {
-    setChirps(chirps.map(chirp => {
-      if (chirp.id === id) {
+              <span className="hidden xl:inline ml-4">Search</span>
+            </Link>
         const isRechirped = !chirp.isRechirped;
-        return {
-          ...chirp,
+            <Link to="/notifications" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/notifications') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
           rechirps: chirp.rechirps + (isRechirped ? 1 : -1),
           isRechirped
         };
-      }
-      return chirp;
+              <span className="hidden xl:inline ml-4">Notifications</span>
+            </Link>
     }));
-  };
-  
+            <Link to="/chats" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/chats') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
   const HomeIcon = getIcon('Home');
   const SearchIcon = getIcon('Search');
-  const BellIcon = getIcon('Bell');
-  const MessageCircleIcon = getIcon('MessageCircle');
+              <span className="hidden xl:inline ml-4">Messages</span>
+            </Link>
   const BookmarkIcon = getIcon('Bookmark');
-  const UserIcon = getIcon('User');
-  const SettingsIcon = getIcon('Settings');
+            <Link to="/saved" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/saved') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
   const HeartIcon = getIcon('Heart');
   const RepeatIcon = getIcon('Repeat');
-  const MessageSquareIcon = getIcon('MessageSquare');
+              <span className="hidden xl:inline ml-4">Bookmarks</span>
+            </Link>
+            
+            <Link to="/settings" className={`flex items-center p-3 w-full hover:bg-surface-100 dark:hover:bg-surface-800 rounded-full ${isActive('/settings') ? 'font-bold' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span className="hidden xl:inline ml-4">Settings</span>
+            </Link>
+            
+            {/* Create button */}
+            <button 
+              onClick={handleOpenCreateModal}
+              className="mt-6 btn-primary w-full">
+              <span className="hidden xl:inline">Create</span>
+              <span className="inline xl:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+              </span>
   const ShareIcon = getIcon('Share');
-  const VerifiedIcon = getIcon('BadgeCheck');
   const MoreHorizontalIcon = getIcon('MoreHorizontal');
-  const TrendingUpIcon = getIcon('TrendingUp');
-  const GlobeIcon = getIcon('Globe');
-  
-  const formatChirpTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-
     if (diffInSeconds < 60) {
       return `${diffInSeconds}s`;
     } else if (diffInSeconds < 3600) {
       return `${Math.floor(diffInSeconds / 60)}m`;
     } else return `${Math.floor(diffInSeconds / 3600)}h`;
-  };
-
-  return (
+                    alt="John Doe" 
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
     <div className="relative flex min-h-screen">
       {/* Left Sidebar */}
       <aside className="hidden sm:flex flex-col w-20 xl:w-64 p-4 sticky top-0 h-screen border-r border-surface-200 dark:border-surface-700">
@@ -153,7 +175,7 @@ const Home = () => {
             <button className="flex items-center justify-center xl:justify-start p-3 rounded-full text-primary bg-primary/10 font-medium">
               <HomeIcon className="h-6 w-6" />
               <span className="hidden xl:block ml-4">Home</span>
-            </button>
+          </div>
             <Link to="/search" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
               <SearchIcon className="h-6 w-6" />
               <span className="hidden xl:block ml-4">Explore</span>
@@ -184,12 +206,15 @@ const Home = () => {
             >
               <SettingsIcon className="h-6 w-6" />
               <span className="hidden xl:block ml-4">Settings</span>
-            </Link>
-          </nav>
+                  alt={chirp.username}
+                  className="w-12 h-12 rounded-full object-cover" 
           
-          <button className="mt-6 btn-primary w-full">
-            <span className="hidden xl:inline">Chirp</span>
-            <span className="xl:hidden">+</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hidden xl:block w-5 h-5 ml-auto">
+                  <circle cx="12" cy="12" r="1"></circle>
+                  <circle cx="19" cy="12" r="1"></circle>
+                  <circle cx="5" cy="12" r="1"></circle>
+                </svg>
+              </div>
           </button>
         
           <div className="mt-auto flex items-center p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 cursor-pointer">
@@ -199,45 +224,58 @@ const Home = () => {
             className="w-10 h-10 rounded-full object-cover"
           />
           <div className="hidden xl:block ml-3">
-            <p className="font-medium text-sm">Your Name</p>
-            <p className="text-surface-500 text-xs">@yourusername</p>
-          </div>
+                  src={chirp.image}
+                  alt="Chirp content" 
+                  className="mt-3 rounded-xl max-h-96 w-full object-cover object-center"
           <MoreHorizontalIcon className="hidden xl:block w-5 h-5 ml-auto" />
         </div>
         </div>
       </aside>
       
       {/* Main Content */}
-      <main className="flex-1 max-w-2xl w-full mx-auto border-x border-surface-200 dark:border-surface-700">
+                   className="flex items-center space-x-1 group"
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700 px-4 py-3">
-          <h1 className="text-xl font-bold">Home</h1>
+                  <div className="p-2 rounded-full group-hover:bg-accent/10 group-hover:text-accent transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                    </svg>
           
-          <div className="mt-3 flex">
+                  <span className="text-xs">{chirp.likes}</span>
             <button 
               onClick={() => setActiveTab('for-you')} 
               className={`flex-1 py-3 relative ${activeTab === 'for-you' ? 'font-bold' : 'text-surface-500'}`}
-            >
+                  className="flex items-center space-x-1 group"
               For you
-              {activeTab === 'for-you' && (
-                <motion.div 
+                  <div className="p-2 rounded-full group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"
+                  <span className="text-xs">{chirp.comments}</span>
                 ></motion.div>
               )}
             </button>
-            <button 
+                  className="flex items-center space-x-1 group"
               onClick={() => setActiveTab('following')} 
-              className={`flex-1 py-3 relative ${activeTab === 'following' ? 'font-bold' : 'text-surface-500'}`}
-            >
+                  <div className="p-2 rounded-full group-hover:bg-secondary/10 group-hover:text-secondary transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                      <path d="m8 3 4 4.5L8 12"></path>
+                      <path d="M4 7.5h8"></path>
+                      <path d="m16 21-4-4.5 4-4.5"></path>
+                      <path d="M20 16.5h-8"></path>
+                    </svg>
+                  </div>
+                  <span className="text-xs">{chirp.retweets}</span>
               Following
-              {activeTab === 'following' && (
-                <motion.div 
                   layoutId="activeTab"
                   className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"
-                ></motion.div>
+                  className="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
               )}
-            </button>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                  </svg>
           </div>
         </header>
         
@@ -254,10 +292,10 @@ const Home = () => {
                   alt={chirp.displayName} 
                   className="w-12 h-12 rounded-full object-cover mr-3 flex-shrink-0"
                 />
-                <div className="flex-1 min-w-0">
+              <h2 className="font-bold text-xl">Who to follow</h2>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center">
-                      <h3 className="font-bold text-base hover:underline truncate mr-1">{chirp.displayName}</h3>
+            <div className="divide-y divide-surface-200 dark:divide-surface-700">
                       {chirp.verified && (
                         <VerifiedIcon className="w-4 h-4 text-primary flex-shrink-0" />
                       )}
@@ -265,7 +303,7 @@ const Home = () => {
                     </div>
                     <button className="p-2 rounded-full hover:bg-primary/10 text-surface-500">
                       <MoreHorizontalIcon className="w-5 h-5" />
-                    </button>
+                        className="w-12 h-12 rounded-full object-cover"
                   </div>
                   
                   <p className="mt-1 mb-2 text-[15px] text-balance">{chirp.content}</p>
@@ -281,20 +319,27 @@ const Home = () => {
                   )}
                   
                   <div className="flex justify-between mt-3 max-w-md">
-                    <button className="flex items-center text-surface-500 hover:text-primary group">
+              <button className="text-primary hover:underline text-sm">Show more</button>
                       <div className="p-2 rounded-full group-hover:bg-primary/10">
                         <MessageSquareIcon className="w-5 h-5" />
                       </div>
                       <span className="text-sm ml-1">{chirp.replies}</span>
                     </button>
                     
-                    <button 
+              <h2 className="font-bold text-xl">Trends for you</h2>
                       onClick={() => handleRechirp(chirp.id)} 
                       className={`flex items-center ${chirp.isRechirped ? 'text-green-500' : 'text-surface-500 hover:text-green-500'} group`}
-                    >
+            <div className="divide-y divide-surface-200 dark:divide-surface-700">
                       <div className={`p-2 rounded-full ${chirp.isRechirped ? 'bg-green-500/10' : 'group-hover:bg-green-500/10'}`}>
                         <RepeatIcon className="w-5 h-5" />
                       </div>
+          
+          {/* Create Chirp Modal */}
+          <AnimatePresence>
+            {showCreateModal && (
+              <div id="createChirpModal" className="fixed z-50 inset-0"></div>
+            )}
+          </AnimatePresence>
                       <span className="text-sm ml-1">{chirp.rechirps}</span>
                     </button>
                     
@@ -303,6 +348,8 @@ const Home = () => {
                       className={`flex items-center ${chirp.isLiked ? 'text-accent' : 'text-surface-500 hover:text-accent'} group`}
                     >
                       <div className={`p-2 rounded-full ${chirp.isLiked ? 'bg-accent/10' : 'group-hover:bg-accent/10'}`}>
+
+export { Home };
                         <HeartIcon className="w-5 h-5" fill={chirp.isLiked ? "currentColor" : "none"} />
                       </div>
                       <span className="text-sm ml-1">{chirp.likes}</span>

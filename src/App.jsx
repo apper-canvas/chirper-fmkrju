@@ -11,9 +11,10 @@ import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import NotFound from './pages/NotFound';
 import getIcon from './utils/iconUtils';
+import CreateChirpModal from './components/CreateChirpModal';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode, setDarkMode] = useState(() => {  
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
     }
@@ -36,12 +37,28 @@ function App() {
       autoClose: 2000,
     });
   };
+  
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [chirps, setChirps] = useState([]);
+  
+  const handleOpenCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+  
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+  
+  const handleAddChirp = (newChirp) => {
+    setChirps((prevChirps) => [newChirp, ...prevChirps]);
+  };
 
   const MoonIcon = getIcon('Moon');
   const SunIcon = getIcon('Sun');
 
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50 transition-colors duration-200">
+      <CreateChirpModal isOpen={isCreateModalOpen} onClose={handleCloseCreateModal} onAddChirp={handleAddChirp} />
       <button
         onClick={toggleDarkMode}
         className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-surface-200 dark:bg-surface-800 shadow-neu-light dark:shadow-neu-dark hover:scale-105 transition-all duration-200"
@@ -61,7 +78,7 @@ function App() {
       </button>
       
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home chirps={chirps} onAddChirp={handleAddChirp} onOpenCreateModal={handleOpenCreateModal} />} />
         <Route path="/search" element={<Search />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/chats" element={<ChatPage />} />
