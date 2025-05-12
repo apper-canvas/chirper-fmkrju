@@ -145,7 +145,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
 
         <nav className="flex-1 w-full">
           <ul className="space-y-1">
-function Home() {
+            {navItems.map(item => (
               <li key={item.name}>
                 <a
                   href={item.path}
@@ -197,7 +197,9 @@ function Home() {
                   <div className="flex items-center">
                     <span className="font-bold mr-1">User Name</span>
                     {i % 2 === 0 && (
-                {getIcon("Plus", true)}
+                      <span className="ml-1">
+                        <VerifiedIcon className="w-4 h-4 text-primary" />
+                      </span>
                     )}
                     <span className="text-surface-500 dark:text-surface-400 ml-1">@username · 2h</span>
                     <button className="ml-auto p-1 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
@@ -251,35 +253,29 @@ function Home() {
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             {React.createElement(getIcon('Search'), { className: "w-5 h-5 text-surface-400" })}
           </div>
+          </div>
           <input 
             type="search"
             placeholder="Search chirps"
             className="input-field pl-10 bg-surface-100 dark:bg-surface-800"
-          />
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+        </div>
+
                 {getIcon("Search", false)}
         {/* Trending */}
-        <div className="card mb-6">
+          <h2 className="text-xl font-bold mb-4">Trends for you</h2>
                 className="w-full py-3 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           <div className="space-y-4">
             {trendingTopics.map((topic, index) => (
               <div 
                 key={index}
                 className="flex justify-between items-center hover:bg-surface-100 dark:hover:bg-surface-700 p-2 rounded-lg cursor-pointer"
-              >
-                <div>
-                  <div className="font-bold">{topic.tag}</div>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl mb-4">
-              <h2 className="px-4 py-3 text-xl font-bold">Trends for you</h2>
-                <MoreHorizontalIcon className="w-5 h-5 text-surface-400" />
-                <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" key={index}>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Trending {topic.category}</span>
-                    <DotsThreeOutline className="text-gray-500" size={20} />
-            </a>
-                  <p className="font-bold">{topic.name}</p>
-                  <span className="text-sm text-gray-500">{topic.chirps} chirps</span>
-        
+                <div className="font-bold">{topic.tag}</div>
+                <span className="text-sm text-surface-500">{topic.chirps} chirps</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
               ))}
         <div className="card">
           <h2 className="text-xl font-bold mb-4">Who to follow</h2>
@@ -312,5 +308,12 @@ function Home() {
             <a href="/suggestions" className="block text-primary hover:underline p-2">
               Show more
             </a>
+
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
 
 export default Home;
