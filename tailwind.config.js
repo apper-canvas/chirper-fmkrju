@@ -44,6 +44,14 @@ export default {
       borderRadius: {
         'xl': '0.75rem',
         '2xl': '1rem'
+      },
+      spacing: {
+        'button-sm': '2.5rem',
+        'button-md': '3rem',
+        'button-lg': '3.5rem'
+      },
+      minWidth: {
+        'button': '8rem'
       }
     },
   },
