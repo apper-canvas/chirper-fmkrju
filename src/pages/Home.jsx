@@ -180,10 +180,10 @@ const Home = () => {
             <span className="hidden xl:block ml-4">Messages</span>
           </Link>
           
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+          <Link to="/saved" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <BookmarkIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Bookmarks</span>
-          </button>
+          </Link>
           
           <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <UserIcon className="h-6 w-6" />
@@ -489,6 +489,9 @@ const Home = () => {
         </Link>
         <Link to="/chats" className="p-2">
           <MessageCircleIcon className="w-6 h-6" />
+        </Link>
+        <Link to="/saved" className="p-2">
+          <BookmarkIcon className="w-6 h-6" />
         </Link>
       </nav>
       
