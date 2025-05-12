@@ -185,10 +185,10 @@ const Home = () => {
             <span className="hidden xl:block ml-4">Bookmarks</span>
           </Link>
           
-          <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+          <Link to="/profile" className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <UserIcon className="h-6 w-6" />
             <span className="hidden xl:block ml-4">Profile</span>
-          </button>
+          </Link>
           
           <button className="flex items-center justify-center xl:justify-start p-3 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
             <SettingsIcon className="h-6 w-6" />
