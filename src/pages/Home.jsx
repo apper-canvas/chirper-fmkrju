@@ -13,8 +13,10 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   
   // Redux hooks
   const dispatch = useDispatch();
-  const followedUsers = useSelector(state => state.follow.followedUsers);
-
+  const followedUsers = useSelector((state) => state.follow.followedUsers);
+  const [expandedFollowList, setExpandedFollowList] = useState(false);
+  const [isLoadingMoreUsers, setIsLoadingMoreUsers] = useState(false);
+  
   // Mock data for trending topics
   const trendingTopics = [
     {
@@ -66,6 +68,27 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       avatar: 'https://images.unsplash.com/photo-1526510747491-58f928ec870f?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
       isVerified: true,
     },
+    {
+      id: 4,
+      name: 'Marcus Wright',
+      username: '@mwright_dev',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
+      isVerified: false,
+    },
+    {
+      id: 5,
+      name: 'Tanya Rodriguez',
+      username: '@tanrodui',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
+      isVerified: true,
+    },
+    {
+      id: 6,
+      name: 'Dev Williams',
+      username: '@devwilliams',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
+      isVerified: false,
+    }
   ];
   const navItems = [
     {
@@ -136,6 +159,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const ChevronRightIcon = getIcon('ChevronRight');
   const VerifiedIcon = getIcon('Badge');
   const MoreHorizontalIcon = getIcon('MoreHorizontal');
+  const LoaderIcon = getIcon('Loader2');
   const Plus = getIcon('Plus');
   
   // Toggle follow status for a user
@@ -148,6 +172,22 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
     if (followedUsers.includes(username)) {
       toast.info(`Unfollowed ${displayName}`);
     } else {
+  // Handle Show More/Less button click
+  const handleShowMoreToggle = () => {
+    if (expandedFollowList) {
+      setExpandedFollowList(false);
+      toast.info("Showing fewer suggestions");
+    } else {
+      setIsLoadingMoreUsers(true);
+      // Simulate API loading delay
+      setTimeout(() => {
+        setExpandedFollowList(true);
+        setIsLoadingMoreUsers(false);
+        toast.success("More suggestions loaded");
+      }, 800);
+    }
+  };
+
       toast.success(`Following ${displayName}`);
     }
   };
@@ -304,7 +344,9 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         <div className="card">
           <h2 className="text-xl font-bold mb-4">Who to follow</h2>
           <div className="space-y-4">
-            {whoToFollow.map(user => (
+            {whoToFollow
+              .slice(0, expandedFollowList ? 6 : 3)
+              .map(user => (
               <div key={user.id} className="flex items-center justify-between">
                 <div className="flex items-center">
                   <img 
@@ -336,8 +378,18 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
                 </button>
               </div>
             ))}
-            <a href="/suggestions" className="block text-primary hover:underline p-2">
-              Show more
+            <button 
+              onClick={handleShowMoreToggle}
+              disabled={isLoadingMoreUsers}
+              className="block w-full text-primary hover:underline p-2 text-center transition-colors duration-200"
+            >
+              {isLoadingMoreUsers ? (
+                <span className="flex items-center justify-center">
+                  <LoaderIcon className="animate-spin h-4 w-4 mr-2" />
+                  Loading...
+                </span>
+              ) : expandedFollowList ? "Show less" : "Show more"}
+            </button>
             </a>
           </div>
         </div>
