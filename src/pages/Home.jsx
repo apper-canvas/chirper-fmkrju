@@ -66,12 +66,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       avatar: 'https://images.unsplash.com/photo-1526510747491-58f928ec870f?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
       isVerified: true,
     },
-                  <button className="p-3 rounded-full bg-primary text-white hover:bg-primary-dark relative" onClick={() => navigate('/')}>
-                    <img 
-                      src="/chirper-logo.svg" 
-                      alt="Chirper" 
-                      className="h-6 w-6 absolute inset-0 m-auto"
-                    />
   
   // Navigation items
   const navItems = [
@@ -174,6 +168,12 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       <aside className="w-20 xl:w-72 h-screen sticky top-0 border-r border-surface-200 dark:border-surface-700 px-4 py-4 flex flex-col items-center xl:items-start">
         <div className="mb-4 p-2">
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+            <img 
+              src="/chirper-logo.svg" 
+              alt="Chirper" 
+              className="h-6 w-6"
+              onClick={() => window.location.href = '/'}
+            />
           </div>
         </div>
           <ul className="space-y-1">
