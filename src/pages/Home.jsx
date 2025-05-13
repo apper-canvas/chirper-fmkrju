@@ -172,6 +172,10 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
     if (followedUsers.includes(username)) {
       toast.info(`Unfollowed ${displayName}`);
     } else {
+      toast.success(`Following ${displayName}`);
+    }
+  };
+  
   // Handle Show More/Less button click
   const handleShowMoreToggle = () => {
     if (expandedFollowList) {
@@ -185,10 +189,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         setIsLoadingMoreUsers(false);
         toast.success("More suggestions loaded");
       }, 800);
-    }
-  };
-
-      toast.success(`Following ${displayName}`);
     }
   };
 
@@ -390,7 +390,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
                 </span>
               ) : expandedFollowList ? "Show less" : "Show more"}
             </button>
-            </a>
           </div>
         </div>
       </aside>
