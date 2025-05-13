@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
+import { toggleFollowUser } from '../redux/features/followSlice';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('latest');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const dispatch = useDispatch();
+  const followedUsers = useSelector(state => state.follow.followedUsers);
 
   // Icon components
   const SearchIcon = getIcon('Search');
@@ -102,6 +108,17 @@ const Search = () => {
       setSearchResults(mockResults[activeFilter]);
       setIsSearching(false);
     }, 800);
+  };
+
+  // Handle follow/unfollow action
+  const handleToggleFollow = (username, displayName) => {
+    dispatch(toggleFollowUser(username));
+    
+    if (followedUsers.includes(username)) {
+      toast.info(`Unfollowed ${displayName}`);
+    } else {
+      toast.success(`Following ${displayName}`);
+    }
   };
 
   // Format timestamp to readable format
@@ -227,7 +244,16 @@ const Search = () => {
                       <p className="mt-1">{person.bio}</p>
                       <div className="text-surface-500 text-sm mt-1">{person.followers} followers</div>
                     </div>
-                    <button className="btn-primary text-sm py-1.5">Follow</button>
+                    <button
+                      onClick={() => handleToggleFollow(person.username, person.displayName)}
+                      className={`text-sm py-1.5 ${
+                        followedUsers.includes(person.username)
+                          ? 'btn-outline hover:bg-surface-100 dark:hover:bg-surface-700'
+                          : 'btn-primary'
+                      }`}
+                    >
+                      {followedUsers.includes(person.username) ? 'Following' : 'Follow'}
+                    </button>
                   </div>
                 </div>
               ))

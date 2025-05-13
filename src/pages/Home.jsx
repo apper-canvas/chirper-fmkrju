@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
+import getIcon from '../utils/iconUtils'; 
 import MainFeature from '../components/MainFeature';
 import getIcon from '../utils/iconUtils';
 
@@ -10,6 +12,10 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const [activeNavItem, setActiveNavItem] = useState('/');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
+  // Redux hooks
+  const dispatch = useDispatch();
+  const followedUsers = useSelector(state => state.follow.followedUsers);
+
   // Mock data for trending topics
   const trendingTopics = [
     {
@@ -22,6 +28,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
     },
     {
       tag: '#100DaysOfCode',
+  const Plus = getIcon('Plus');
       chirps: '8.3K',
     },
     {
@@ -107,6 +114,20 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       icon: 'Settings',
       activeIcon: 'SettingsFill',
     },
+  // Toggle follow status for a user
+  const handleToggleFollow = (username, displayName) => {
+    dispatch({
+      type: 'follow/toggleFollowUser',
+      payload: username
+    });
+    
+    if (followedUsers.includes(username)) {
+      toast.info(`Unfollowed ${displayName}`);
+    } else {
+      toast.success(`Following ${displayName}`);
+    }
+  };
+
   ];
   
   const getActiveNavItem = (item) => {
@@ -163,7 +184,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
 
         <div className="mt-auto w-full px-2 mb-4">
           <button 
-            className="mt-6 btn-primary w-full flex items-center justify-center"
+              className="bg-primary text-white w-full h-12 rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors duration-200" 
             onClick={onOpenCreateModal}
           >
             <span className="hidden xl:inline">Chirp</span>
@@ -323,3 +344,13 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   );
 }
 export default Home;
+                      <button
+                        onClick={() => handleToggleFollow(user.username, user.displayName)}
+                        className={`text-sm py-1.5 ${
+                          followedUsers.includes(user.username)
+                            ? 'btn-outline hover:bg-surface-100 dark:hover:bg-surface-700'
+                            : 'btn-primary'
+                        }`}
+                      >
+                        {followedUsers.includes(user.username) ? 'Following' : 'Follow'}
+                      </button>
