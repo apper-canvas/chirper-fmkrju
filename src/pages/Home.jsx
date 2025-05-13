@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils'; 
 import MainFeature from '../components/MainFeature';
-import getIcon from '../utils/iconUtils';
 
 function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const location = useLocation();
@@ -25,10 +24,9 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
     {
       tag: '#TailwindCSS',
       chirps: '9.8K',
-    },
+    },    
     {
       tag: '#100DaysOfCode',
-  const Plus = getIcon('Plus');
       chirps: '8.3K',
     },
     {
@@ -114,20 +112,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       icon: 'Settings',
       activeIcon: 'SettingsFill',
     },
-  // Toggle follow status for a user
-  const handleToggleFollow = (username, displayName) => {
-    dispatch({
-      type: 'follow/toggleFollowUser',
-      payload: username
-    });
-    
-    if (followedUsers.includes(username)) {
-      toast.info(`Unfollowed ${displayName}`);
-    } else {
-      toast.success(`Following ${displayName}`);
-    }
-  };
-
   ];
   
   const getActiveNavItem = (item) => {
@@ -155,6 +139,20 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const VerifiedIcon = getIcon('Badge');
   const MoreHorizontalIcon = getIcon('MoreHorizontal');
   const Plus = getIcon('Plus');
+  
+  // Toggle follow status for a user
+  const handleToggleFollow = (username, displayName) => {
+    dispatch({
+      type: 'follow/toggleFollowUser',
+      payload: username
+    });
+    
+    if (followedUsers.includes(username)) {
+      toast.info(`Unfollowed ${displayName}`);
+    } else {
+      toast.success(`Following ${displayName}`);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50">
@@ -322,8 +320,15 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
                     </div>
                   </div>
                 </div>
-                <button className="btn-outline py-1 px-4 text-sm">
-                  Follow
+                <button
+                  onClick={() => handleToggleFollow(user.username, user.name)}
+                  className={`text-sm py-1.5 px-4 ${
+                    followedUsers.includes(user.username)
+                      ? 'btn-outline hover:bg-surface-100 dark:hover:bg-surface-700'
+                      : 'btn-primary'
+                  }`}
+                >
+                  {followedUsers.includes(user.username) ? 'Following' : 'Follow'}
                 </button>
               </div>
             ))}
@@ -344,13 +349,4 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   );
 }
 export default Home;
-                      <button
-                        onClick={() => handleToggleFollow(user.username, user.displayName)}
-                        className={`text-sm py-1.5 ${
-                          followedUsers.includes(user.username)
-                            ? 'btn-outline hover:bg-surface-100 dark:hover:bg-surface-700'
-                            : 'btn-primary'
-                        }`}
-                      >
-                        {followedUsers.includes(user.username) ? 'Following' : 'Follow'}
-                      </button>
+
