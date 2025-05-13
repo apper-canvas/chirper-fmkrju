@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import Home from './pages/Home';
@@ -22,14 +21,6 @@ function App() {
     return false;
   });
 
-        <ToastContainer
-          position="bottom-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          theme="colored"
-        />
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -96,19 +87,19 @@ function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      
+
       <ToastContainer
-        position="top-right"
+        position="bottom-center"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop
         closeOnClick
+        theme="colored"
+        toastClassName="rounded-xl shadow-lg"
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme={darkMode ? "dark" : "light"}
-        toastClassName="rounded-xl shadow-lg"
       />
     </div>
   );
