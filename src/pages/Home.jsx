@@ -139,10 +139,10 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       <aside className="w-20 xl:w-72 h-screen sticky top-0 border-r border-surface-200 dark:border-surface-700 px-4 py-4 flex flex-col items-center xl:items-start">
         <div className="mb-4 p-2">
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">C</span>
-          </div>
-        </div>
-
+            <div className="fixed bottom-16 right-4 md:bottom-24 md:right-12 z-10">
+              <button onClick={() => setIsCreateModalOpen(true)} className="bg-primary p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center w-14 h-14">
+                <Plus className="text-white h-6 w-6" />
+              </button>
         <nav className="flex-1 w-full">
           <ul className="space-y-1">
             {navItems.map(item => (
