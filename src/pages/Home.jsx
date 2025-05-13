@@ -276,18 +276,18 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
           </div>
         </div>
 
-              ))}
         <div className="card">
           <h2 className="text-xl font-bold mb-4">Who to follow</h2>
           <div className="space-y-4">
             {whoToFollow.map(user => (
               <div key={user.id} className="flex items-center justify-between">
+                <div className="flex items-center">
                   <img 
                     src={user.avatar} 
                     alt={user.name} 
                     className="w-12 h-12 rounded-full mr-3"
                   />
-                  <div>
+                  <div className="flex-1">
                     <div className="flex items-center">
                       <span className="font-bold">{user.name}</span>
                       {user.isVerified && (
