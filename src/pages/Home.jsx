@@ -66,8 +66,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       avatar: 'https://images.unsplash.com/photo-1526510747491-58f928ec870f?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
       isVerified: true,
     },
-  
-  // Navigation items
+  ];
   const navItems = [
     {
       name: 'Home',
@@ -120,15 +119,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         <>
           <IconComponent className="w-7 h-7" />
           <span className="ml-4 text-lg font-medium hidden xl:block">{item.name}</span>
-        {/* Logo */}
-        <div className="px-4 mb-6">
-          <a href="/" className="flex items-center justify-center md:justify-start hover:opacity-80 transition-opacity duration-200">
-            <div className="w-12 h-12 text-primary dark:text-primary-light flex items-center justify-center">
-              <img src="/chirper-logo.svg" alt="Chirper" className="w-10 h-10" />
-            </div>
-            <span className="hidden md:block ml-2 text-xl font-bold text-primary dark:text-primary-light">Chirper</span>
-          </a>
-        </div>
         </>
       );
     }
