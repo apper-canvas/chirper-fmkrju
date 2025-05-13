@@ -8,6 +8,7 @@ import getIcon from '../utils/iconUtils';
 function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const location = useLocation();
   const [activeNavItem, setActiveNavItem] = useState('/');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Mock data for trending topics
   const trendingTopics = [
@@ -132,6 +133,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
   const ChevronRightIcon = getIcon('ChevronRight');
   const VerifiedIcon = getIcon('Badge');
   const MoreHorizontalIcon = getIcon('MoreHorizontal');
+  const Plus = getIcon('Plus');
 
   return (
     <div className="flex min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50">
@@ -139,11 +141,8 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       <aside className="w-20 xl:w-72 h-screen sticky top-0 border-r border-surface-200 dark:border-surface-700 px-4 py-4 flex flex-col items-center xl:items-start">
         <div className="mb-4 p-2">
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-            <div className="fixed bottom-16 right-4 md:bottom-24 md:right-12 z-10">
-              <button onClick={() => setIsCreateModalOpen(true)} className="bg-primary p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center w-14 h-14">
-                <Plus className="text-white h-6 w-6" />
-              </button>
-        <nav className="flex-1 w-full">
+          </div>
+        </div>
           <ul className="space-y-1">
             {navItems.map(item => (
               <li key={item.name}>
@@ -164,12 +163,15 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
 
         <div className="mt-auto w-full px-2 mb-4">
           <button 
-            className="mt-6 btn-primary w-full"
+            className="mt-6 btn-primary w-full flex items-center justify-center"
             onClick={onOpenCreateModal}
           >
             <span className="hidden xl:inline">Chirp</span>
-            <span className="xl:hidden">+</span>
+            <span className="xl:hidden flex items-center justify-center">
+              <Plus className="h-6 w-6" />
+            </span>
           </button>
+        </div>
         </div>
       </aside>
 
@@ -251,7 +253,9 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         {/* Search */}
         <div className="relative mb-6">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                className="bg-primary rounded-full h-14 w-14 fixed bottom-20 right-6 shadow-lg md:hidden flex items-center justify-center"
+            <svg className="h-5 w-5 text-surface-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
           </div>
           <input 
             type="search"
@@ -275,7 +279,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
             ))}
           </div>
         </div>
-
         <div className="card">
           <h2 className="text-xl font-bold mb-4">Who to follow</h2>
           <div className="space-y-4">
@@ -307,12 +310,17 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
             <a href="/suggestions" className="block text-primary hover:underline p-2">
               Show more
             </a>
-
           </div>
         </div>
       </aside>
+      
+      {/* Mobile create button */}
+      <div className="fixed bottom-16 right-4 md:bottom-24 md:right-12 z-10 md:hidden">
+        <button onClick={() => setIsCreateModalOpen(true)} className="bg-primary p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center w-14 h-14">
+          <Plus className="text-white h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 }
-
 export default Home;
