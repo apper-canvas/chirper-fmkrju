@@ -159,7 +159,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
               </li>
             ))}
           </ul>
-        </nav>
+        
 
         <div className="mt-auto w-full px-2 mb-4">
           <button 
@@ -171,7 +171,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
               <Plus className="h-6 w-6" />
             </span>
           </button>
-        </div>
         </div>
       </aside>
 
