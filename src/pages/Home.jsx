@@ -253,22 +253,22 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             {React.createElement(getIcon('Search'), { className: "w-5 h-5 text-surface-400" })}
           </div>
-          </div>
           <input 
             type="search"
             placeholder="Search chirps"
             className="input-field pl-10 bg-surface-100 dark:bg-surface-800"
+          />
         </div>
 
-                {getIcon("Search", false)}
         {/* Trending */}
+        <div className="card mb-6">
           <h2 className="text-xl font-bold mb-4">Trends for you</h2>
-                className="w-full py-3 pl-10 pr-4 bg-gray-100 dark:bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           <div className="space-y-4">
             {trendingTopics.map((topic, index) => (
               <div 
                 key={index}
                 className="flex justify-between items-center hover:bg-surface-100 dark:hover:bg-surface-700 p-2 rounded-lg cursor-pointer"
+              >
                 <div className="font-bold">{topic.tag}</div>
                 <span className="text-sm text-surface-500">{topic.chirps} chirps</span>
               </div>
@@ -282,7 +282,6 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
           <div className="space-y-4">
             {whoToFollow.map(user => (
               <div key={user.id} className="flex items-center justify-between">
-                <div className="flex items-center">
                   <img 
                     src={user.avatar} 
                     alt={user.name} 
