@@ -251,7 +251,7 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
         {/* Search */}
         <div className="relative mb-6">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            {React.createElement(getIcon('Search'), { className: "w-5 h-5 text-surface-400" })}
+                className="bg-primary rounded-full h-14 w-14 fixed bottom-20 right-6 shadow-lg md:hidden flex items-center justify-center"
           </div>
           <input 
             type="search"
