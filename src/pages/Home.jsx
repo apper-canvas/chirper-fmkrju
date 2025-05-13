@@ -66,7 +66,12 @@ function Home({ chirps, onAddChirp, onOpenCreateModal }) {
       avatar: 'https://images.unsplash.com/photo-1526510747491-58f928ec870f?ixlib=rb-1.2.1&auto=format&fit=crop&w=64&q=80',
       isVerified: true,
     },
-  ];
+                  <button className="p-3 rounded-full bg-primary text-white hover:bg-primary-dark relative" onClick={() => navigate('/')}>
+                    <img 
+                      src="/chirper-logo.svg" 
+                      alt="Chirper" 
+                      className="h-6 w-6 absolute inset-0 m-auto"
+                    />
   
   // Navigation items
   const navItems = [
