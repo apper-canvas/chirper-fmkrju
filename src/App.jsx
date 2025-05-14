@@ -39,7 +39,7 @@ function App() {
     return false;
   });
   
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); 
   const [chirps, setChirps] = useState([]);
 
   useEffect(() => {
@@ -131,8 +131,6 @@ function App() {
     });
   };
   
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [chirps, setChirps] = useState([]);
   
   const handleOpenCreateModal = () => {
     setIsCreateModalOpen(true);
@@ -149,68 +147,16 @@ function App() {
   const MoonIcon = getIcon('Moon');
   const SunIcon = getIcon('Sun');
 
-  return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50 transition-colors duration-200">
-      <CreateChirpModal isOpen={isCreateModalOpen} onClose={handleCloseCreateModal} onAddChirp={handleAddChirp} />
-      <button
-        onClick={toggleDarkMode}
-        className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-surface-200 dark:bg-surface-800 shadow-neu-light dark:shadow-neu-dark hover:scale-105 transition-all duration-200"
-        aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={darkMode ? 'dark' : 'light'}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {darkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-          </motion.div>
-        </AnimatePresence>
-      </button>
-      
-      <Routes>
-        <Route path="/" element={<Home chirps={chirps} onAddChirp={handleAddChirp} onOpenCreateModal={handleOpenCreateModal} />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/chats" element={<ChatPage />} />
-        <Route path="/saved" element={<SavedItems />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      <ToastContainer
-        position="bottom-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        theme="colored"
-        toastClassName="rounded-xl shadow-lg"
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </div>
-  );
-}
-
-export default App;
-
-
-
-  
   // Authentication methods to share via context
   const authMethods = {
     isInitialized,
     logout: async () => {
       try {
+
         const { ApperUI } = window.ApperSDK;
         await ApperUI.logout();
         dispatch(clearUser());
+        navigate('/login');
         navigate('/login');
       } catch (error) {
         console.error("Logout failed:", error);
@@ -222,6 +168,8 @@ export default App;
   if (!isInitialized) {
     return <div className="loading">Initializing application...</div>;
   }
+  
+  return (
     <AuthContext.Provider value={authMethods}>
       <div className="min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50 transition-colors duration-200">
         <CreateChirpModal isOpen={isCreateModalOpen} onClose={handleCloseCreateModal} onAddChirp={handleAddChirp} />
@@ -273,3 +221,7 @@ export default App;
         />
       </div>
     </AuthContext.Provider>
+  );
+}
+
+export default App;
