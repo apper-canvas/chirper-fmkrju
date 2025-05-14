@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast, ToastContainer } from 'react-toastify';
 import { format } from 'date-fns';
 import getIcon from '../utils/iconUtils';
 
@@ -118,6 +119,10 @@ const ChatPage = () => {
 
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const infoButtonRef = useRef(null);
 
   // Icons
   const HomeIcon = getIcon('Home');
@@ -206,11 +211,68 @@ const ChatPage = () => {
     ));
   };
 
+  const handleInfoButtonClick = () => {
+    setShowInfoPanel(!showInfoPanel);
+  };
+
+  const handlePinConversation = () => {
+    setIsPinned(!isPinned);
+    toast.success(`Conversation ${isPinned ? 'unpinned' : 'pinned'} successfully!`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  const handleMuteNotifications = () => {
+    setIsMuted(!isMuted);
+    toast.success(`Notifications ${isMuted ? 'unmuted' : 'muted'} successfully!`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  const handleAddPeople = () => {
+    toast.info("Feature coming soon: Add people to conversation", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  // Close info panel when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showInfoPanel && 
+          infoButtonRef.current && 
+          !infoButtonRef.current.contains(event.target) && 
+          !event.target.closest('.info-panel')) {
+        setShowInfoPanel(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showInfoPanel]);
+
   const activeUser = conversations.find(conv => conv.id === activeConversation)?.user;
 
   return (
     <div className="flex min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50">
       {/* Main Container */}
+      <ToastContainer position="top-right" theme="colored" />
       <div className="flex w-full max-w-6xl mx-auto">
         {/* Sidebar - Conversations */}
         <div className="w-full sm:w-80 md:w-96 border-r border-surface-200 dark:border-surface-700">
@@ -295,13 +357,66 @@ const ChatPage = () => {
                   </p>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
+                  <button 
+                    ref={infoButtonRef}
+                    className={`p-2 rounded-full ${showInfoPanel ? 'bg-surface-200 dark:bg-surface-700' : 'hover:bg-surface-200 dark:hover:bg-surface-700'}`}
+                    onClick={handleInfoButtonClick}
+                  >
                     <InfoIcon className="w-5 h-5" />
                   </button>
                   <button className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                     <MoreVerticalIcon className="w-5 h-5" />
                   </button>
                 </div>
+                
+                {/* Info Panel */}
+                {showInfoPanel && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.1 }}
+                    className="info-panel absolute right-16 top-16 bg-white dark:bg-surface-800 rounded-lg shadow-lg border border-surface-200 dark:border-surface-700 w-80 z-20"
+                  >
+                    <div className="p-4 border-b border-surface-200 dark:border-surface-700">
+                      <h3 className="font-bold text-lg">Conversation Info</h3>
+                    </div>
+                    
+                    <div className="p-4 flex flex-col items-center border-b border-surface-200 dark:border-surface-700">
+                      <img 
+                        src={activeUser.avatar} 
+                        alt={activeUser.name} 
+                        className="w-24 h-24 rounded-full object-cover mb-3"
+                      />
+                      <div className="text-center">
+                        <div className="flex items-center justify-center">
+                          <h2 className="font-bold text-xl">{activeUser.name}</h2>
+                          {activeUser.verified && (
+                            <VerifiedIcon className="w-5 h-5 text-primary ml-1" />
+                          )}
+                        </div>
+                        <p className="text-sm text-surface-500">@{activeUser.username}</p>
+                        <p className="mt-2 text-sm">
+                          {activeUser.isOnline ? 'Online now' : 'Offline'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 space-y-2">
+                      <button onClick={handlePinConversation} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors">
+                        <PinIcon className="w-5 h-5 text-surface-500" />
+                        <span>{isPinned ? 'Unpin Conversation' : 'Pin Conversation'}</span>
+                      </button>
+                      <button onClick={handleMuteNotifications} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors">
+                        <BellOffIcon className="w-5 h-5 text-surface-500" />
+                        <span>{isMuted ? 'Unmute Notifications' : 'Mute Notifications'}</span>
+                      </button>
+                      <button onClick={handleAddPeople} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors">
+                        <UserPlusIcon className="w-5 h-5 text-surface-500" />
+                        <span>Add People</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               {/* Messages */}
