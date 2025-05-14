@@ -1,88 +1,42 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchSavedItems, removeSavedItem } from '../store/savedItemsSlice';
+import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
 import { format } from 'date-fns';
 
 const SavedItems = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { savedItems, isLoading, error } = useSelector(state => state.savedItems);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Icons
   const ArrowLeftIcon = getIcon('ArrowLeft');
-  const HeartIcon = getIcon('Heart');
-  const RepeatIcon = getIcon('Repeat');
-  const MessageSquareIcon = getIcon('MessageSquare');
-  const ShareIcon = getIcon('Share');
   const VerifiedIcon = getIcon('BadgeCheck');
-  const MoreHorizontalIcon = getIcon('MoreHorizontal');
   const FilterIcon = getIcon('Filter');
   const BookmarkIcon = getIcon('Bookmark');
   const SearchIcon = getIcon('Search');
-  
-  // State for saved items
-  const [savedItems, setSavedItems] = useState(() => {
-    const saved = localStorage.getItem('savedItems');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 1,
-        username: "elonmusk",
-        displayName: "Elon Musk",
-        avatar: "https://images.unsplash.com/photo-1590086782957-93c06ef21604?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        verified: true,
-        content: "Excited to announce our new rocket launch tomorrow! 🚀",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        likes: 2458,
-        rechirps: 582,
-        replies: 304,
-        views: "1.2M",
-        isLiked: false,
-        category: "technology"
-      },
-      {
-        id: 2,
-        username: "nasa",
-        displayName: "NASA",
-        avatar: "https://images.unsplash.com/photo-1569974585997-8246297d7b0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        verified: true,
-        content: "Our telescopes have captured stunning new images of the galaxy cluster MACS J0416. These cosmic giants contain hundreds of galaxies and enormous amounts of dark matter.",
-        image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-        likes: 12653,
-        rechirps: 3982,
-        replies: 529,
-        views: "4.7M",
-        isLiked: true,
-        category: "science"
-      },
-      {
-        id: 3,
-        username: "natgeo",
-        displayName: "National Geographic",
-        avatar: "https://images.unsplash.com/photo-1535390313236-547a29de6024?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        verified: true,
-        content: "The endangered Amur leopard is one of the world's most elusive cats. Today, only around 100 remain in the wild.",
-        timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-        likes: 7845,
-        rechirps: 1253,
-        replies: 243,
-        views: "2.3M",
-        isLiked: false,
-        category: "nature"
-      }
-    ];
-  });
-  
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Save to localStorage whenever savedItems changes
+  const LoaderIcon = getIcon('Loader2');
+
   useEffect(() => {
-    localStorage.setItem('savedItems', JSON.stringify(savedItems));
-  }, [savedItems]);
-  
+    dispatch(fetchSavedItems());
+  }, [dispatch]);
+
   // Remove item from saved
-  const removeFromSaved = (id) => {
-    setSavedItems(savedItems.filter(item => item.id !== id));
+  const handleRemoveItem = (id) => {
+    dispatch(removeSavedItem(id))
+      .unwrap()
+      .then(() => {
+        toast.success('Item removed from bookmarks');
+      })
+      .catch(() => {
+        toast.error('Failed to remove item');
+      });
   };
-  
+
   // Format time (reusing from Home component)
   const formatChirpTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -101,33 +55,48 @@ const SavedItems = () => {
   };
   
   // Filter saved items based on activeFilter and searchQuery
-  const filteredItems = savedItems.filter(item => {
-    // Filter by category
-    if (activeFilter !== 'all' && item.category !== activeFilter) {
-      return false;
-    }
-    
-    // Filter by search query
-    if (searchQuery && !item.content.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !item.displayName.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    
-    return true;
-  });
+  const filteredItems = savedItems
+    .filter(item => {
+      if (!item.chirp) return false;
+      
+      // Filter by category
+      if (activeFilter !== 'all' && item.chirp.category !== activeFilter) {
+        return false;
+      }
+      
+      // Filter by search query
+      if (searchQuery && !item.chirp.content.toLowerCase().includes(searchQuery.toLowerCase()) && 
+          !item.chirp.display_name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      return true;
+    });
+
+  if (isLoading && savedItems.length === 0) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-surface-50 dark:bg-surface-900">
+        <LoaderIcon className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50">
       <div className="max-w-2xl mx-auto border-x border-surface-200 dark:border-surface-700 min-h-screen">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700 px-4 py-3">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="p-2 -ml-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={() => navigate(-1)}
+                className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800"
+              >
               <ArrowLeftIcon className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-xl font-bold">Bookmarks</h1>
-              <p className="text-surface-500 text-sm">@yourusername</p>
+              </button>
+              <div>
+                <h1 className="text-xl font-bold">Bookmarks</h1>
+              </div>
             </div>
           </div>
           
@@ -233,3 +202,42 @@ const SavedItems = () => {
 };
 
 export default SavedItems;
+                key="all"
+                onClick={() => setActiveFilter('all')}
+                className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
+                  activeFilter === 'all'
+                    ? 'bg-primary text-white font-medium'
+                    : 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700'
+                All
+              </button>
+              {['technology', 'science', 'nature', 'business', 'politics'].map(filter => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
+                    activeFilter === filter
+                      ? 'bg-primary text-white font-medium'
+                      : 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700'
+                  }`}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </button>
+              ))}
+            filteredItems.map(item => item.chirp && (
+              <article key={item.Id} className="p-4 hover:bg-surface-100 dark:hover:bg-surface-800/50 transition-colors">
+                    src={item.chirp.avatar || `https://i.pravatar.cc/48?img=${item.chirp.Id}`} 
+                    alt={item.chirp.display_name} 
+                        <h3 className="font-bold text-base hover:underline truncate mr-1">{item.chirp.display_name}</h3>
+                        {item.chirp.verified && (
+                        <span className="text-surface-500 text-sm ml-1 truncate">@{item.chirp.username} · {formatChirpTime(item.chirp.CreatedOn)}</span>
+                          onClick={() => handleRemoveItem(item.Id)}
+                    <p className="mt-1 mb-2 text-[15px] text-balance">{item.chirp.content}</p>
+                    {item.chirp.image && (
+                      <div className="mt-2 mb-3 rounded-2xl overflow-hidden">
+                        <img 
+                          src={item.chirp.image} 
+                          alt="Chirp media" 
+                          className="w-full h-auto max-h-96 object-cover"
+                        />
+                      </div>
+                    )}
