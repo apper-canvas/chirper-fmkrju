@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import EmojiPicker from 'emoji-picker-react';
 import { toast, ToastContainer } from 'react-toastify';
 import { format } from 'date-fns'; 
+import { useReactMediaRecorder } from 'react-media-recorder';
 import getIcon from '../utils/iconUtils';
 
 const ChatPage = () => {
@@ -133,6 +134,11 @@ const ChatPage = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingInterval, setRecordingIntervalRef] = useState(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
+  const audioRef = useRef(null);
 
   // Icons
   const HomeIcon = getIcon('Home');
@@ -155,11 +161,39 @@ const ChatPage = () => {
   const UserXIcon = getIcon('UserX');
   const ArchiveIcon = getIcon('Archive');
   const VerifiedIcon = getIcon('BadgeCheck');
+  const StopCircleIcon = getIcon('StopCircle');
+  const PlayIcon = getIcon('Play');
+  const PauseIcon = getIcon('Pause');
+  const XIcon = getIcon('X');
+
+  // Media recorder setup
+  const {
+    status,
+    startRecording,
+    stopRecording,
+    mediaBlobUrl,
+    clearBlobUrl
+  } = useReactMediaRecorder({ 
+    audio: true,
+    video: false,
+    onStop: (blobUrl, blob) => {
+      setAudioPreviewUrl(blobUrl);
+      setIsRecording(false);
+    },
+    onStart: () => {
+      setIsRecording(true);
+      setRecordingTime(0);
+      const interval = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      setRecordingIntervalRef(interval);
+    },
+  });
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
+  
   useEffect(() => {
     if (showEmojiPicker && textareaRef.current) {
       textareaRef.current.focus();
@@ -169,6 +203,18 @@ const ChatPage = () => {
   useEffect(() => {
     return () => filePreviewUrls.forEach(url => URL.revokeObjectURL(url));
   }, [filePreviewUrls]);
+  
+  // Cleanup recording interval when component unmounts or recording stops
+  useEffect(() => {
+    return () => {
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+      }
+      if (mediaBlobUrl) {
+        clearBlobUrl();
+      }
+    };
+  }, [recordingInterval, mediaBlobUrl, clearBlobUrl]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -237,6 +283,81 @@ const ChatPage = () => {
         draggable: true,
       });
     }
+  };
+  
+  const handleMicButtonClick = () => {
+    if (status === 'recording') {
+      stopRecording();
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+        setRecordingIntervalRef(null);
+      }
+    } else if (audioPreviewUrl) {
+      // If there's an audio preview, send it
+      handleSendAudioMessage();
+    } else {
+      // Start new recording
+      startRecording();
+    }
+  };
+  
+  const cancelRecording = () => {
+    if (status === 'recording') {
+      stopRecording();
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+        setRecordingIntervalRef(null);
+      }
+    }
+    if (audioPreviewUrl) {
+      clearBlobUrl();
+      setAudioPreviewUrl(null);
+    }
+    toast.info("Recording canceled", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  };
+  
+  const handleSendAudioMessage = async () => {
+    if (!audioPreviewUrl) return;
+    
+    const newMsg = {
+      id: Date.now(),
+      sentByMe: true,
+      timestamp: new Date().toISOString(),
+      content: "Voice message",
+      audioUrl: audioPreviewUrl,
+      isAudio: true
+    };
+    
+    setMessages([...messages, newMsg]);
+    
+    setConversations(conversations.map(conv => 
+      conv.id === activeConversation 
+        ? { 
+            ...conv, 
+            lastMessage: { 
+              content: "Voice message",
+              timestamp: new Date().toISOString(),
+              isRead: true,
+              sentByMe: true
+            } 
+          } : conv));
+    
+    clearBlobUrl();
+    setAudioPreviewUrl(null);
+    
+    toast.success("Voice message sent", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  };
+  
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   const handleEmojiClick = (emojiData) => {
@@ -659,7 +780,33 @@ const ChatPage = () => {
                   >
                     <div className={`max-w-[75%] ${message.sentByMe ? 'bg-primary text-white' : 'bg-surface-100 dark:bg-surface-700'} rounded-2xl p-3 px-4`}>
                       <p className="text-[15px]">{message.content}</p>
-                      
+                     
+                      {/* Audio Player for Voice Messages */}
+                      {message.isAudio && message.audioUrl && (
+                        <div className="mt-2">
+                          <audio 
+                            src={message.audioUrl} 
+                            controls 
+                            className={`w-full h-10 ${message.sentByMe ? 'text-white' : 'text-surface-900 dark:text-white'}`}
+                            style={{
+                              backgroundColor: 'transparent',
+                              // Custom styles for audio player to match the app's theme
+                              '--webkit-media-controls-panel-background-color': 'transparent',
+                              '--webkit-media-controls-current-time-display': message.sentByMe ? 'white' : 'inherit',
+                              '--webkit-media-controls-time-remaining-display': message.sentByMe ? 'white' : 'inherit',
+                            }}
+                          >
+                            Your browser does not support the audio element.
+                          </audio>
+                          <div className="flex items-center mt-1">
+                            <MicIcon className={`w-4 h-4 mr-1 ${message.sentByMe ? 'text-primary-light' : 'text-surface-500'}`} />
+                            <span className={`text-xs ${message.sentByMe ? 'text-primary-light' : 'text-surface-500'}`}>
+                              Voice Message
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       {/* File Attachments */}
                       {message.attachments && message.attachments.length > 0 && (
                         <div className="mt-2 space-y-2">
@@ -736,6 +883,41 @@ const ChatPage = () => {
                       </div>
                     ))}
                   </div>
+                
+                {/* Audio Recording UI */}
+                {isRecording && (
+                  <div className="mb-3 p-3 bg-surface-100 dark:bg-surface-700 rounded-lg flex items-center">
+                    <div className="recording-indicator mr-3 relative">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-red-500 rounded-full absolute top-0 left-0 animate-ping opacity-75"></div>
+                    </div>
+                    <span className="text-surface-900 dark:text-white mr-4">Recording... {formatTime(recordingTime)}</span>
+                    <button 
+                      onClick={cancelRecording} 
+                      className="p-1 bg-surface-200 dark:bg-surface-600 rounded-full hover:bg-surface-300 dark:hover:bg-surface-500 ml-auto"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                
+                {/* Audio Preview UI */}
+                {audioPreviewUrl && !isRecording && (
+                  <div className="mb-3 p-3 bg-surface-100 dark:bg-surface-700 rounded-lg flex items-center">
+                    <audio 
+                      ref={audioRef}
+                      src={audioPreviewUrl} 
+                      controls 
+                      className="w-full h-10"
+                    >
+                      Your browser does not support the audio element.
+                    </audio>
+                    <button onClick={cancelRecording} className="p-1 bg-surface-200 dark:bg-surface-600 rounded-full hover:bg-surface-300 dark:hover:bg-surface-500 ml-2">
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                
                 )}
                 <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
                   <button type="button" onClick={handleFileSelect} className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
@@ -772,8 +954,20 @@ const ChatPage = () => {
                     </div>
                   )}
                   </div>
-                  
-                  <button type="button" className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
+
+                  <button 
+                    type="button" 
+                    onClick={handleMicButtonClick}
+                    className={`p-2 rounded-full ${
+                      isRecording 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : audioPreviewUrl 
+                          ? 'bg-green-500 text-white hover:bg-green-600' 
+                          : 'hover:bg-surface-200 dark:hover:bg-surface-700'
+                    }`}
+                    disabled={newMessage.trim() !== ''}
+                  >
+                    {isRecording ? <StopCircleIcon className="w-5 h-5" /> : 
                     <MicIcon className="w-5 h-5" />
                   </button>
                   <button 
