@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import EmojiPicker from 'emoji-picker-react';
 import { toast, ToastContainer } from 'react-toastify';
-import { format } from 'date-fns';
+import { format } from 'date-fns'; 
 import getIcon from '../utils/iconUtils';
 
 const ChatPage = () => {
@@ -129,6 +130,8 @@ const ChatPage = () => {
   const [isMuted, setIsMuted] = useState(false);
   const infoButtonRef = useRef(null);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef(null);
 
   // Icons
   const HomeIcon = getIcon('Home');
@@ -155,6 +158,12 @@ const ChatPage = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (showEmojiPicker && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [showEmojiPicker]);
 
   useEffect(() => {
     return () => filePreviewUrls.forEach(url => URL.revokeObjectURL(url));
@@ -227,6 +236,17 @@ const ChatPage = () => {
         draggable: true,
       });
     }
+  };
+
+  const handleEmojiClick = (emojiData) => {
+    const emoji = emojiData.emoji;
+    const cursorPosition = textareaRef.current.selectionStart;
+    const updatedMessage = newMessage.slice(0, cursorPosition) + emoji + newMessage.slice(cursorPosition);
+    setNewMessage(updatedMessage);
+    setShowEmojiPicker(false);
+    setTimeout(() => {
+      textareaRef.current.focus();
+    }, 10);
   };
   
   const handleFileSelect = () => {
@@ -416,6 +436,19 @@ const ChatPage = () => {
     };
   }, [showMoreMenu]);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showEmojiPicker && 
+          emojiPickerRef.current && 
+          !emojiPickerRef.current.contains(event.target) &&
+          !event.target.closest('.emoji-button')) {
+        setShowEmojiPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showEmojiPicker]);
+
   const handleOutsideClick = (event, isOpen, buttonRef, menuSelector, setOpen) => {
     if (isOpen && 
         buttonRef.current && 
@@ -423,6 +456,11 @@ const ChatPage = () => {
         !event.target.closest(menuSelector)) {
       setOpen(false);
     }
+  };
+
+  const toggleEmojiPicker = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+    setShowMoreMenu(false);
   };
   const activeUser = conversations.find(conv => conv.id === activeConversation)?.user;
 
@@ -703,11 +741,12 @@ const ChatPage = () => {
                     <PaperclipIcon className="w-5 h-5" />
                   </button>
                   <input
+                    ref={textareaRef}
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message"
-                    className="flex-1 input-field bg-surface-100 dark:bg-surface-700 border-none"
+                    className="flex-1 input-field bg-surface-100 dark:bg-surface-700 border-none relative"
                   />
                   <input
                     type="file"
@@ -718,9 +757,21 @@ const ChatPage = () => {
                     accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
                   />
                   
-                  <button type="button" className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
+                  <div className="relative">
+                  <button 
+                    type="button" 
+                    className="emoji-button p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700"
+                    onClick={toggleEmojiPicker}
+                  >
                     <SmileIcon className="w-5 h-5" />
                   </button>
+                  {showEmojiPicker && (
+                    <div ref={emojiPickerRef} className="absolute bottom-14 right-0 z-50 shadow-lg rounded-lg">
+                      <EmojiPicker onEmojiClick={handleEmojiClick} width={320} height={400} />
+                    </div>
+                  )}
+                  </div>
+                  
                   <button type="button" className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                     <MicIcon className="w-5 h-5" />
                   </button>
