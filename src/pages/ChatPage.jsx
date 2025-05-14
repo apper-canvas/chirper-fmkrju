@@ -123,6 +123,7 @@ const ChatPage = () => {
   const fileInputRef = useRef(null);
   const moreButtonRef = useRef(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const textareaRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [filePreviewUrls, setFilePreviewUrls] = useState([]);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
