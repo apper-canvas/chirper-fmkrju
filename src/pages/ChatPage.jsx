@@ -657,6 +657,9 @@ const ChatPage = () => {
                 <Link to="/" className="md:hidden p-2 mr-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                   <ArrowLeftIcon className="w-5 h-5" />
                 </Link>
+                <Link to="/" className="flex items-center p-2 mr-4 text-surface-600 dark:text-surface-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  <ArrowLeftIcon className="w-5 h-5" />
+                </Link>
                 <img 
                   src={activeUser.avatar} 
                   alt={activeUser.name} 
