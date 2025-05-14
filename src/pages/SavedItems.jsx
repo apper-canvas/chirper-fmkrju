@@ -170,7 +170,7 @@ const SavedItems = () => {
                           onClick={() => removeFromSaved(item.id)}
                           className="p-2 rounded-full hover:bg-primary/10 text-primary"
                           aria-label="Remove from bookmarks"
-                        >
+                        > 
                           <BookmarkIcon className="w-5 h-5" fill="currentColor" />
                         </button>
                         <button className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-500">
@@ -202,42 +202,3 @@ const SavedItems = () => {
 };
 
 export default SavedItems;
-                key="all"
-                onClick={() => setActiveFilter('all')}
-                className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                  activeFilter === 'all'
-                    ? 'bg-primary text-white font-medium'
-                    : 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700'
-                All
-              </button>
-              {['technology', 'science', 'nature', 'business', 'politics'].map(filter => (
-                <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                    activeFilter === filter
-                      ? 'bg-primary text-white font-medium'
-                      : 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700'
-                  }`}
-                >
-                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
-            filteredItems.map(item => item.chirp && (
-              <article key={item.Id} className="p-4 hover:bg-surface-100 dark:hover:bg-surface-800/50 transition-colors">
-                    src={item.chirp.avatar || `https://i.pravatar.cc/48?img=${item.chirp.Id}`} 
-                    alt={item.chirp.display_name} 
-                        <h3 className="font-bold text-base hover:underline truncate mr-1">{item.chirp.display_name}</h3>
-                        {item.chirp.verified && (
-                        <span className="text-surface-500 text-sm ml-1 truncate">@{item.chirp.username} · {formatChirpTime(item.chirp.CreatedOn)}</span>
-                          onClick={() => handleRemoveItem(item.Id)}
-                    <p className="mt-1 mb-2 text-[15px] text-balance">{item.chirp.content}</p>
-                    {item.chirp.image && (
-                      <div className="mt-2 mb-3 rounded-2xl overflow-hidden">
-                        <img 
-                          src={item.chirp.image} 
-                          alt="Chirp media" 
-                          className="w-full h-auto max-h-96 object-cover"
-                        />
-                      </div>
-                    )}
