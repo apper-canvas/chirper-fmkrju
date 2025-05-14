@@ -1,6 +1,5 @@
  import { configureStore } from '@reduxjs/toolkit';
-import followReducer from './features/followSlice';
-import followReducer from './followSlice';
+import followReducer from '../redux/features/followSlice';
 import userReducer from './userSlice';
 import chirpsReducer from './chirpsSlice';
 import userProfilesReducer from './userProfilesSlice';
@@ -14,8 +13,7 @@ import savedItemsReducer from './savedItemsSlice';
     userProfiles: userProfilesReducer,
     savedItems: savedItemsReducer
    },
-  devTools: process.env.NODE_ENV !== 'production',
-  devTools: true,
+  devTools: process.env.NODE_ENV !== 'production' || true,
  });
  
  export default store;
