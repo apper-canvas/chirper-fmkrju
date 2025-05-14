@@ -119,10 +119,13 @@ const ChatPage = () => {
 
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
+  const moreButtonRef = useRef(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const infoButtonRef = useRef(null);
+  const [isBlocked, setIsBlocked] = useState(false);
 
   // Icons
   const HomeIcon = getIcon('Home');
@@ -140,6 +143,10 @@ const ChatPage = () => {
   const BellOffIcon = getIcon('BellOff');
   const UserPlusIcon = getIcon('UserPlus');
   const PaperclipIcon = getIcon('Paperclip');
+  const TrashIcon = getIcon('Trash');
+  const FlagIcon = getIcon('Flag');
+  const UserXIcon = getIcon('UserX');
+  const ArchiveIcon = getIcon('Archive');
   const VerifiedIcon = getIcon('BadgeCheck');
 
   useEffect(() => {
@@ -214,6 +221,54 @@ const ChatPage = () => {
   const handleInfoButtonClick = () => {
     setShowInfoPanel(!showInfoPanel);
   };
+  
+  const handleMoreButtonClick = () => {
+    setShowMoreMenu(!showMoreMenu);
+    // Close info panel if it's open
+    if (showInfoPanel) {
+      setShowInfoPanel(false);
+    }
+  };
+
+  const handleDeleteConversation = () => {
+    toast.success("Conversation deleted successfully", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    setShowMoreMenu(false);
+    setConversations(conversations.filter(conv => conv.id !== activeConversation));
+    setActiveConversation(null);
+  };
+
+  const handleReportUser = () => {
+    toast.info("User reported. We'll review this conversation", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    setShowMoreMenu(false);
+  };
+
+  const handleBlockUser = () => {
+    setIsBlocked(!isBlocked);
+    toast.success(`User ${isBlocked ? 'unblocked' : 'blocked'} successfully`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    setShowMoreMenu(false);
+  };
+
 
   const handlePinConversation = () => {
     setIsPinned(!isPinned);
@@ -250,15 +305,22 @@ const ChatPage = () => {
     });
   };
 
-  // Close info panel when clicking outside
+  const handleArchivedMessages = () => {
+    toast.info("Archived messages will be available soon", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    setShowMoreMenu(false);
+  };
+
+  // Close panels when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (showInfoPanel && 
-          infoButtonRef.current && 
-          !infoButtonRef.current.contains(event.target) && 
-          !event.target.closest('.info-panel')) {
-        setShowInfoPanel(false);
-      }
+      handleOutsideClick(event, showInfoPanel, infoButtonRef, '.info-panel', setShowInfoPanel);
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -267,6 +329,25 @@ const ChatPage = () => {
     };
   }, [showInfoPanel]);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      handleOutsideClick(event, showMoreMenu, moreButtonRef, '.more-menu', setShowMoreMenu);
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMoreMenu]);
+
+  const handleOutsideClick = (event, isOpen, buttonRef, menuSelector, setOpen) => {
+    if (isOpen && 
+        buttonRef.current && 
+        !buttonRef.current.contains(event.target) && 
+        !event.target.closest(menuSelector)) {
+      setOpen(false);
+    }
+  };
   const activeUser = conversations.find(conv => conv.id === activeConversation)?.user;
 
   return (
@@ -364,8 +445,43 @@ const ChatPage = () => {
                   >
                     <InfoIcon className="w-5 h-5" />
                   </button>
-                  <button className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
+                  <button 
+                    ref={moreButtonRef}
+                    className={`p-2 rounded-full ${showMoreMenu ? 'bg-surface-200 dark:bg-surface-700' : 'hover:bg-surface-200 dark:hover:bg-surface-700'}`}
+                    onClick={handleMoreButtonClick}
+                  >
                     <MoreVerticalIcon className="w-5 h-5" />
+                    {showMoreMenu && (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.1 }}
+                        className="more-menu absolute right-0 top-12 bg-white dark:bg-surface-800 rounded-lg shadow-lg border border-surface-200 dark:border-surface-700 w-64 z-20"
+                      >
+                        <div className="p-1">
+                          <button onClick={handleDeleteConversation} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-left">
+                            <TrashIcon className="w-5 h-5 text-red-500" />
+                            <span>Delete Conversation</span>
+                          </button>
+                          
+                          <button onClick={handleReportUser} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-left">
+                            <FlagIcon className="w-5 h-5 text-surface-500" />
+                            <span>Report</span>
+                          </button>
+                          
+                          <button onClick={handleBlockUser} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-left">
+                            <UserXIcon className="w-5 h-5 text-surface-500" />
+                            <span>{isBlocked ? 'Unblock User' : 'Block User'}</span>
+                          </button>
+                          
+                          <button onClick={handleArchivedMessages} className="flex items-center space-x-3 w-full p-3 rounded-md hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-left">
+                            <ArchiveIcon className="w-5 h-5 text-surface-500" />
+                            <span>Archived Messages</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                    
                   </button>
                 </div>
                 
