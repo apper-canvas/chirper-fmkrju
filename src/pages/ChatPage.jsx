@@ -883,7 +883,7 @@ const ChatPage = () => {
                       </div>
                     ))}
                   </div>
-                
+                )}
                 {/* Audio Recording UI */}
                 {isRecording && (
                   <div className="mb-3 p-3 bg-surface-100 dark:bg-surface-700 rounded-lg flex items-center">
@@ -918,7 +918,6 @@ const ChatPage = () => {
                   </div>
                 )}
                 
-                )}
                 <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
                   <button type="button" onClick={handleFileSelect} className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                     <PaperclipIcon className="w-5 h-5" />
