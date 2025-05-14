@@ -967,7 +967,7 @@ const ChatPage = () => {
                     disabled={newMessage.trim() !== ''}
                   >
                     {isRecording ? <StopCircleIcon className="w-5 h-5" /> : 
-                    <MicIcon className="w-5 h-5" />
+                    <><MicIcon className="w-5 h-5" /></>}
                   </button>
                   <button 
                     type="submit" 
