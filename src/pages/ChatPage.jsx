@@ -119,8 +119,11 @@ const ChatPage = () => {
 
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
   const moreButtonRef = useRef(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filePreviewUrls, setFilePreviewUrls] = useState([]);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -153,6 +156,10 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    return () => filePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+  }, [filePreviewUrls]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -160,11 +167,16 @@ const ChatPage = () => {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim() === '') return;
+
+    const attachments = selectedFiles.map((file, index) => ({
+      id: `${Date.now()}-${index}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: filePreviewUrls[index]
+    }));
     
     const newMsg = {
-      id: Date.now(),
-      content: newMessage,
-      timestamp: new Date().toISOString(),
       sentByMe: true
     };
     
@@ -172,6 +184,21 @@ const ChatPage = () => {
     setNewMessage('');
 
     // Update last message in conversation
+    let messageContent = newMessage.trim();
+    if (attachments.length > 0) {
+      if (messageContent) {
+        newMsg.content = messageContent;
+        newMsg.attachments = attachments;
+      } else {
+        newMsg.content = `Sent ${attachments.length} ${attachments.length === 1 ? 'file' : 'files'}`;
+        newMsg.attachments = attachments;
+      }
+    } else {
+      newMsg.content = messageContent;
+    }
+    
+    newMsg.id = Date.now();
+    newMsg.timestamp = new Date().toISOString();
     setConversations(conversations.map(conv => 
       conv.id === activeConversation 
         ? { 
@@ -185,6 +212,55 @@ const ChatPage = () => {
           } 
         : conv
     ));
+    
+    // Clear file previews and selected files
+    setSelectedFiles([]);
+    setFilePreviewUrls([]);
+    
+    if (attachments.length > 0) {
+      toast.success(`${attachments.length} ${attachments.length === 1 ? 'file' : 'files'} sent successfully`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
+  
+  const handleFileSelect = () => {
+    fileInputRef.current.click();
+  };
+  
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const maxSize = 10 * 1024 * 1024; // 10MB limit
+    
+    const validFiles = files.filter(file => file.size <= maxSize);
+    
+    if (validFiles.length < files.length) {
+      toast.error("Some files exceeded the 10MB size limit and were not added", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+    
+    setSelectedFiles([...selectedFiles, ...validFiles]);
+    
+    // Generate preview URLs
+    const newPreviewUrls = validFiles.map(file => URL.createObjectURL(file));
+    setFilePreviewUrls([...filePreviewUrls, ...newPreviewUrls]);
+  };
+  
+  const removeFile = (index) => {
+    URL.revokeObjectURL(filePreviewUrls[index]);
+    const newFiles = [...selectedFiles];
+    const newUrls = [...filePreviewUrls];
+    newFiles.splice(index, 1);
+    newUrls.splice(index, 1);
+    setSelectedFiles(newFiles);
+    setFilePreviewUrls(newUrls);
   };
 
   const formatMessageTime = (timestamp) => {
@@ -544,6 +620,40 @@ const ChatPage = () => {
                   >
                     <div className={`max-w-[75%] ${message.sentByMe ? 'bg-primary text-white' : 'bg-surface-100 dark:bg-surface-700'} rounded-2xl p-3 px-4`}>
                       <p className="text-[15px]">{message.content}</p>
+                      
+                      {/* File Attachments */}
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {message.attachments.map((attachment) => (
+                            <div 
+                              key={attachment.id} 
+                              className={`rounded-lg overflow-hidden ${message.sentByMe ? 'bg-primary-dark' : 'bg-surface-200 dark:bg-surface-600'}`}
+                            >
+                              {attachment.type.startsWith('image/') ? (
+                                <div className="attachment-preview">
+                                  <img 
+                                    src={attachment.url} 
+                                    alt={attachment.name} 
+                                    className="max-h-48 max-w-full object-contain"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="p-3 flex items-center">
+                                  <PaperclipIcon className="w-5 h-5 mr-2" />
+                                  <div className="overflow-hidden">
+                                    <p className="truncate text-sm font-medium">{attachment.name}</p>
+                                    <p className="text-xs opacity-75">
+                                      {(attachment.size / 1024).toFixed(1)} KB
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Timestamp */}
                       <p className={`text-xs mt-1 ${message.sentByMe ? 'text-primary-light' : 'text-surface-500'}`}>
                         {formatMessageTime(message.timestamp)}
                       </p>
@@ -555,8 +665,41 @@ const ChatPage = () => {
 
               {/* Message Input */}
               <div className="p-4 border-t border-surface-200 dark:border-surface-700 sticky bottom-0 bg-white dark:bg-surface-800">
+                {/* File Previews */}
+                {selectedFiles.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2">
+                    {selectedFiles.map((file, index) => (
+                      <div 
+                        key={index} 
+                        className="relative group rounded-lg bg-surface-100 dark:bg-surface-700 overflow-hidden"
+                      >
+                        {file.type.startsWith('image/') ? (
+                          <div className="w-16 h-16 relative">
+                            <img 
+                              src={filePreviewUrls[index]} 
+                              alt={file.name} 
+                              className="w-full h-full object-cover"
+                            />
+                            <button 
+                              onClick={() => removeFile(index)}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <span className="sr-only">Remove</span>
+                              ×
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 flex items-center justify-center relative">
+                            <PaperclipIcon className="w-6 h-6" />
+                            <button onClick={() => removeFile(index)} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
-                  <button type="button" className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
+                  <button type="button" onClick={handleFileSelect} className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                     <PaperclipIcon className="w-5 h-5" />
                   </button>
                   <input
@@ -566,6 +709,15 @@ const ChatPage = () => {
                     placeholder="Type a message"
                     className="flex-1 input-field bg-surface-100 dark:bg-surface-700 border-none"
                   />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    multiple
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                  />
+                  
                   <button type="button" className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-700">
                     <SmileIcon className="w-5 h-5" />
                   </button>
@@ -574,7 +726,7 @@ const ChatPage = () => {
                   </button>
                   <button 
                     type="submit" 
-                    disabled={!newMessage.trim()}
+                    disabled={!newMessage.trim() && selectedFiles.length === 0}
                     className={`p-2 rounded-full ${newMessage.trim() ? 'bg-primary text-white' : 'bg-surface-200 dark:bg-surface-700 text-surface-500'}`}
                   >
                     <SendIcon className="w-5 h-5" />
