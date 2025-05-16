@@ -6,7 +6,8 @@ import { AuthContext } from '../App';
 
 function Login() {
   const navigate = useNavigate();
-  const { isInitialized } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const isInitialized = authContext?.isInitialized;
   const { isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -16,7 +17,7 @@ function Login() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (isInitialized) {
+    if (authContext && isInitialized) {
       // Show login UI in this component
       const { ApperUI } = window.ApperSDK;
       ApperUI.showLogin("#authentication");

@@ -6,13 +6,14 @@ import { AuthContext } from '../App';
 
 function Signup() {
   const navigate = useNavigate();
-  const { isInitialized } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const isInitialized = authContext?.isInitialized;
   const { isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (authContext && isInitialized) {
       navigate('/dashboard');
-    }
+      const { ApperUI } = window.ApperSDK; 
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {

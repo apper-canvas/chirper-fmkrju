@@ -119,9 +119,9 @@ function App() {
       }
     });
     
-    setIsInitialized(true);
   }, [dispatch, navigate]);
 
+  // Called when initialization is complete or during authentication state change
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     toast.info(`${!darkMode ? 'Dark' : 'Light'} mode activated!`, {
