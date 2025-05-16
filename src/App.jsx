@@ -57,6 +57,8 @@ function App() {
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
+
+    setIsInitialized(true);
     
     // Initialize but don't show login yet
     ApperUI.setup(client, {
@@ -118,6 +120,9 @@ function App() {
         console.error("Authentication failed:", error);
       }
     });
+
+    // Make sure isInitialized is set to true
+    setIsInitialized(true);
     
   }, [dispatch, navigate]);
 
@@ -166,7 +171,7 @@ function App() {
 
   // Don't render routes until initialization is complete
   if (!isInitialized) {
-    return <div className="loading">Initializing application...</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-900">Initializing application...</div>;
   }
   
   return (

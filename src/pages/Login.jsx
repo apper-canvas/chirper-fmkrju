@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useContext } from 'react';
 import { AuthContext } from '../App';
 
@@ -17,11 +17,18 @@ function Login() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (authContext && isInitialized) {
-      // Show login UI in this component
-      const { ApperUI } = window.ApperSDK;
-      ApperUI.showLogin("#authentication");
+    const initializeLoginUI = () => {
+      try {
+        if (window.ApperSDK && window.ApperSDK.ApperUI && isInitialized) {
+          // Show login UI in this component
+          const { ApperUI } = window.ApperSDK;
+          ApperUI.showLogin("#authentication");
+        }
+      } catch (error) {
+        console.error("Error initializing login UI:", error);
+      }
     }
+    initializeLoginUI();
   }, [isInitialized]);
 
   return (
