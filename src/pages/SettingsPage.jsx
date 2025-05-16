@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import getIcon from '../utils/iconUtils';
 
 const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState('appearance');
+  const [fontSize, setFontSize] = useState(localStorage.getItem('fontSize') || 'medium');
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
   const [notificationSettings, setNotificationSettings] = useState({
     mentions: true,
@@ -41,6 +42,22 @@ const SettingsPage = () => {
   const PaletteIcon = getIcon('Palette');
   const ChevronDownIcon = getIcon('ChevronDown');
 
+  // Initialize font size from localStorage on mount
+  useEffect(() => {
+    const savedFontSize = localStorage.getItem('fontSize');
+    if (savedFontSize) {
+      setFontSize(savedFontSize);
+      applyFontSize(savedFontSize);
+    }
+  }, []);
+
+  const handleFontSizeChange = (e) => {
+    const newSize = e.target.value;
+    setFontSize(newSize);
+    applyFontSize(newSize);
+    localStorage.setItem('fontSize', newSize);
+  };
+
   const toggleDarkMode = () => {
     if (darkMode) {
       document.documentElement.classList.remove('dark');
@@ -48,6 +65,23 @@ const SettingsPage = () => {
       document.documentElement.classList.add('dark');
     }
     setDarkMode(!darkMode);
+  };
+
+  const applyFontSize = (size) => {
+    // Remove any existing font size classes
+    document.documentElement.classList.remove('text-small', 'text-medium', 'text-large');
+    
+    // Add the selected font size class
+    document.documentElement.classList.add(`text-${size}`);
+    
+    // Apply specific CSS adjustments based on the selected size
+    if (size === 'small') {
+      document.documentElement.style.fontSize = '0.875rem'; // 14px
+    } else if (size === 'medium') {
+      document.documentElement.style.fontSize = '1rem'; // 16px
+    } else if (size === 'large') {
+      document.documentElement.style.fontSize = '1.125rem'; // 18px
+    }
   };
 
   const handleNotificationChange = (setting) => {
@@ -104,10 +138,12 @@ const SettingsPage = () => {
             <p className="text-sm text-surface-600 dark:text-surface-400">Adjust text size across the app</p>
           </div>
           <select 
+            value={fontSize}
+            onChange={handleFontSizeChange}
             className="px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg"
           >
             <option value="small">Small</option>
-            <option value="medium" selected>Medium</option>
+            <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
         </div>

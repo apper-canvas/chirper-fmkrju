@@ -89,5 +89,25 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 0.5rem;
   }
+  
+  /* Font size utility classes */
+  .text-small {
+    font-size: 0.875rem;
+  }
+  
+  .text-small h1, .text-small h2, .text-small h3 {
+    font-size: 90%;
+  }
+  
+  .text-medium {
+    font-size: 1rem;
+  }
+  
+  .text-large {
+    font-size: 1.125rem;
+  }
+  
+  .text-large h1, .text-large h2, .text-large h3 {
+    font-size: 110%;
+  }
 }
-
