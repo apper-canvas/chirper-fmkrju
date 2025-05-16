@@ -10,12 +10,15 @@ function Signup() {
   const isInitialized = authContext?.isInitialized;
   const { isAuthenticated } = useSelector((state) => state.user);
 
+  // If user is already authenticated, redirect to dashboard
   useEffect(() => {
-    if (authContext && isInitialized) {
+    if (isAuthenticated) {
       navigate('/dashboard');
-      const { ApperUI } = window.ApperSDK; 
+    }
   }, [isAuthenticated, navigate]);
 
+  // Initialize signup UI when component mounts and 
+  // ApperUI is initialized
   useEffect(() => {
     if (isInitialized) {
       // Show signup UI in this component
