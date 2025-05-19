@@ -116,6 +116,7 @@ function App() {
             dispatch(clearUser());
         }
         // Set initialization state after authentication is properly evaluated
+        
         setIsInitialized(true);
       },
       onError: function(error) {
