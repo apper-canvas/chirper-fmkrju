@@ -58,8 +58,6 @@ function App() {
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
 
-    setIsInitialized(true);
-    
     // Initialize but don't show login yet
     ApperUI.setup(client, {
       target: '#authentication',
@@ -70,10 +68,14 @@ function App() {
         // DO NOT simplify or modify this pattern as it ensures proper redirection flow
         let currentPath = window.location.pathname + window.location.search;
         let redirectPath = new URLSearchParams(window.location.search).get('redirect');
-        const isAuthPage = currentPath.includes('/login') || currentPath.includes('/signup') || currentPath.includes(
-                '/callback') || currentPath.includes('/error');
+        const isAuthPage = currentPath.includes('/login') || 
+                           currentPath.includes('/signup') || 
+                           currentPath.includes('/callback') || 
+                           currentPath.includes('/error');
+                           
         if (user) {
             // User is authenticated
+            dispatch(setUser(JSON.parse(JSON.stringify(user))));
             if (redirectPath) {
                 navigate(redirectPath);
             } else if (!isAuthPage) {
@@ -82,8 +84,6 @@ function App() {
                 } else {
                     navigate('/dashboard');
                 }
-            } else {
-                navigate('/dashboard');
             }
             // Store user information in Redux
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
@@ -115,16 +115,17 @@ function App() {
             }
             dispatch(clearUser());
         }
+        // Set initialization state after authentication is properly evaluated
+        setIsInitialized(true);
       },
       onError: function(error) {
         console.error("Authentication failed:", error);
+        // Still set initialized to true in case of error to avoid UI freeze
+        setIsInitialized(true);
       }
     });
-
-    // Make sure isInitialized is set to true
-    setIsInitialized(true);
-    
   }, [dispatch, navigate]);
+
 
   // Called when initialization is complete or during authentication state change
   const toggleDarkMode = () => {
@@ -161,7 +162,6 @@ function App() {
         const { ApperUI } = window.ApperSDK;
         await ApperUI.logout();
         dispatch(clearUser());
-        navigate('/login');
         navigate('/login');
       } catch (error) {
         console.error("Logout failed:", error);
