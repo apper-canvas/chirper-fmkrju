@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { toast } from 'react-toastify'; 
+import { setLanguage, setSettingsLoading, setSettingsError } from '../store/settingsSlice';
 import { userProfileService } from '../services/userProfileService';
 import getIcon from '../utils/iconUtils';
 
@@ -15,10 +15,6 @@ const SettingsPage = () => {
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
   const { language, isLoading } = useSelector((state) => state.settings);
   const [notificationSettings, setNotificationSettings] = useState({
-
-    toast.success(`Language changed to ${value}`, {
-      position: "bottom-right"
-    });
     mentions: true,
     replies: true,
     likes: true,
@@ -153,7 +149,9 @@ const SettingsPage = () => {
         if (user && user.emailAddress) {
           await userProfileService.updateLanguagePreference(user.emailAddress, newValue);
         }
-        toast.success(`Language changed to ${newValue}`);
+        toast.success(`Language changed to ${newValue}`, {
+          position: "bottom-right"
+        });
       } catch (error) {
         dispatch(setSettingsError(error.message));
         toast.error(`Failed to update language: ${error.message}`);
