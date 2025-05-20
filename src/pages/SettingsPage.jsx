@@ -42,8 +42,16 @@ const SettingsPage = () => {
   // Ensure language is properly loaded from Redux on component mount
   useEffect(() => {
     if (language && language !== accountSettings.language) {
-      setAccountSettings(prev => ({ ...prev, language }));
+      setAccountSettings(prev => ({ ...prev, language: language }));
     }
+    
+    // Force reapplication of language settings on mount
+    const storedLanguage = localStorage.getItem('language');
+    if (storedLanguage) {
+      localStorage.removeItem('language-applied'); // Clear flag to force reapplication
+      dispatch(setLanguage(storedLanguage)); // Re-dispatch to ensure Redux updates
+    }
+
   }, []);
 
   // Icons
@@ -70,7 +78,7 @@ const SettingsPage = () => {
   // Update account settings when language changes in Redux
   useEffect(() => {
     setAccountSettings(prev => ({ ...prev, language: language }));
-  }, [language]);
+  }, [language, dispatch]);
 
   const handleFontSizeChange = (e) => {
     const newSize = e.target.value;
@@ -133,8 +141,11 @@ const SettingsPage = () => {
       try {
         // Save to Redux store first
         dispatch(setLanguage(newValue));
+        localStorage.setItem('language', newValue);
+        // Force language update across app
+        localStorage.removeItem('language-applied');
         
-        // Then update in database
+        // Update in database (using Tags field to store language preference)
         const user = JSON.parse(localStorage.getItem('user'));
         if (user && user.emailAddress) {
           await userProfileService.updateLanguagePreference(user.emailAddress, newValue);

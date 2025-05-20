@@ -31,7 +31,7 @@ function App() {
   
   // Get authentication status with proper error handling
   const userState = useSelector((state) => state.user);
-  const isAuthenticated = userState?.isAuthenticated || false;
+  const isAuthenticated = userState?.isAuthenticated || false; 
   const { language } = useSelector((state) => state.settings);
 
   const [darkMode, setDarkMode] = useState(() => {  
@@ -52,22 +52,6 @@ function App() {
     }
   }, [darkMode]);
   
-  // Set document language based on selected language
-  // This effect runs when language changes in Redux
-  useEffect(() => {
-    // Map language names to ISO language codes
-    const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
-    document.documentElement.lang = languageMap[language] || 'en';
-    
-    // Update title based on selected language
-    const titles = {
-      'English (US)': 'Chirper - Share your thoughts',
-      'Spanish': 'Chirper - Comparte tus pensamientos',
-      'French': 'Chirper - Partagez vos pensées',
-      'German': 'Chirper - Teilen Sie Ihre Gedanken'
-    };
-    document.title = titles[language] || titles['English (US)'];
-  }, [language]); 
 
   // Initialize ApperUI once when the app loads
   useEffect(() => {
@@ -98,6 +82,7 @@ function App() {
             
             if (redirectPath) {
                 // Load language from localStorage if available
+                localStorage.removeItem('language-applied'); // Clear flag to ensure language is reapplied
                 const storedLanguage = localStorage.getItem('language');
                 if (storedLanguage) {
                     dispatch(setLanguage(storedLanguage));
@@ -119,7 +104,8 @@ function App() {
             
             // Always ensure language is set properly
             const storedLanguage = localStorage.getItem('language');
-            if (storedLanguage) {
+            localStorage.removeItem('language-applied'); // Clear flag to ensure language is reapplied
+            if (storedLanguage && storedLanguage !== language) {
                 dispatch(setLanguage(storedLanguage));
             } else {
                 dispatch(setLanguage('English (US)'));
@@ -166,6 +152,27 @@ function App() {
       }
     });
   }, [dispatch, navigate]);
+
+  // Effect to handle language changes and ensure they're applied globally
+  useEffect(() => {
+    // Prevent duplicate applications during initialization
+    const isApplied = localStorage.getItem('language-applied');
+    if (isApplied === language) return;
+    
+    // Map language names to ISO language codes and apply to document
+    const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
+    document.documentElement.lang = languageMap[language] || 'en';
+    
+    // Update title based on selected language
+    const titles = {
+      'English (US)': 'Chirper - Share your thoughts',
+      'Spanish': 'Chirper - Comparte tus pensamientos',
+      'French': 'Chirper - Partagez vos pensées',
+      'German': 'Chirper - Teilen Sie Ihre Gedanken'
+    };
+    document.title = titles[language] || titles['English (US)'];
+    localStorage.setItem('language-applied', language);
+  }, [language]);
 
 
   // Called when initialization is complete or during authentication state change
