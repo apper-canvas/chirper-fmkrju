@@ -111,13 +111,14 @@ const SettingsPage = () => {
       [setting]: !privacySettings[setting]
     });
   };
+
   const handleAccountChange = async (setting, value) => {
     const newValue = typeof value === 'boolean' ? !accountSettings[setting] : value;
     
-  const handleAccountChange = (setting, value) => {
     setAccountSettings({
+      ...accountSettings,
       [setting]: newValue
-      [setting]: typeof value === 'boolean' ? !accountSettings[setting] : value
+    });
     
     // For language setting, update Redux and save to database
     if (setting === 'language') {
@@ -135,7 +136,6 @@ const SettingsPage = () => {
         dispatch(setSettingsLoading(false));
       }
     }
-    });
   };
 
   const menuItems = [
@@ -277,8 +277,7 @@ const SettingsPage = () => {
             style={{ opacity: isLoading ? 0.7 : 1 }}
           >
             {isLoading && (
-              <LoaderIcon className="animate-spin w-4 h-4 mr-2" />
-            )}
+              <LoaderIcon className="animate-spin w-4 h-4 mr-2" />)}
           >
             <option value="English (US)">English (US)</option>
             <option value="Spanish">Spanish</option>
