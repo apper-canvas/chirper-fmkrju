@@ -32,7 +32,7 @@ function App() {
   // Get authentication status with proper error handling
   const userState = useSelector((state) => state.user);
   const isAuthenticated = userState?.isAuthenticated || false; 
-  const { language } = useSelector((state) => state.settings);
+  const settings = useSelector((state) => state.settings);
 
   const [darkMode, setDarkMode] = useState(() => {  
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -81,9 +81,8 @@ function App() {
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
             
             if (redirectPath) {
-                // Load language from localStorage if available
-                localStorage.removeItem('language-applied'); // Clear flag to ensure language is reapplied
-                const storedLanguage = localStorage.getItem('language');
+                // Set language from localStorage if available
+                const storedLanguage = localStorage.getItem('language') || 'English (US)';
                 if (storedLanguage) {
                     dispatch(setLanguage(storedLanguage));
                 } else {
@@ -102,14 +101,13 @@ function App() {
                 navigate('/dashboard');
             }
             
-            // Always ensure language is set properly
-            const storedLanguage = localStorage.getItem('language');
-            localStorage.removeItem('language-applied'); // Clear flag to ensure language is reapplied
-            if (storedLanguage && storedLanguage !== language) {
+            // Always ensure language is set properly after auth
+            const storedLanguage = localStorage.getItem('language') || 'English (US)';
+            if (storedLanguage) {
                 dispatch(setLanguage(storedLanguage));
             } else {
-                dispatch(setLanguage('English (US)'));
-                localStorage.setItem('language', 'English (US)');
+                const defaultLanguage = 'English (US)';
+                dispatch(setLanguage(defaultLanguage));
             }
             
             // Store user information in Redux
@@ -156,12 +154,13 @@ function App() {
   // Effect to handle language changes and ensure they're applied globally
   useEffect(() => {
     // Prevent duplicate applications during initialization
-    const isApplied = localStorage.getItem('language-applied');
-    if (isApplied === language) return;
+    if (!settings || !settings.language) return;
     
+    const currentLanguage = settings.language;
+
     // Map language names to ISO language codes and apply to document
     const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
-    document.documentElement.lang = languageMap[language] || 'en';
+    document.documentElement.lang = languageMap[currentLanguage] || 'en';
     
     // Update title based on selected language
     const titles = {
@@ -170,9 +169,11 @@ function App() {
       'French': 'Chirper - Partagez vos pensées',
       'German': 'Chirper - Teilen Sie Ihre Gedanken'
     };
-    document.title = titles[language] || titles['English (US)'];
-    localStorage.setItem('language-applied', language);
-  }, [language]);
+    document.title = titles[currentLanguage] || titles['English (US)'];
+    
+    // Ensure language is saved to localStorage
+    localStorage.setItem('language', currentLanguage);
+  }, [settings.language]);
 
 
   // Called when initialization is complete or during authentication state change
