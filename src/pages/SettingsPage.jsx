@@ -39,6 +39,13 @@ const SettingsPage = () => {
     language: language
   });
 
+  // Ensure language is properly loaded from Redux on component mount
+  useEffect(() => {
+    if (language && language !== accountSettings.language) {
+      setAccountSettings(prev => ({ ...prev, language }));
+    }
+  }, []);
+
   // Icons
   const HomeIcon = getIcon('Home');
   const ChevronLeftIcon = getIcon('ChevronLeft');
@@ -124,10 +131,14 @@ const SettingsPage = () => {
     if (setting === 'language') {
       dispatch(setSettingsLoading(true));
       try {
-        // Get current user from Redux store
-        const user = JSON.parse(localStorage.getItem('user'));
-        await userProfileService.updateLanguagePreference(user?.emailAddress || 'unknown', newValue);
+        // Save to Redux store first
         dispatch(setLanguage(newValue));
+        
+        // Then update in database
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.emailAddress) {
+          await userProfileService.updateLanguagePreference(user.emailAddress, newValue);
+        }
         toast.success(`Language changed to ${newValue}`);
       } catch (error) {
         dispatch(setSettingsError(error.message));

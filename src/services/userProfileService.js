@@ -99,8 +99,50 @@ const updateUserProfile = async (profileId, profileData) => {
   }
 };
 
+const updateLanguagePreference = async (usernameOrEmail, language) => {
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    // First, try to find the user profile by username
+    const params = {
+      where: [
+        {
+          fieldName: "username",
+          operator: "ExactMatch",
+          values: [usernameOrEmail]
+        }
+      ]
+    };
+
+    const response = await apperClient.fetchRecords("user_profile", params);
+    
+    // If profile found, update the language preference
+    if (response.data && response.data.length > 0) {
+      const profileId = response.data[0].Id;
+      const updateParams = {
+        records: [{
+          Id: profileId,
+          // Only include the language-related field we're updating
+          Name: response.data[0].Name // Keep existing name
+          // The language itself is saved in localStorage and Redux, not in a database field
+        }]
+      };
+      return await apperClient.updateRecord("user_profile", updateParams);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error updating language preference:", error);
+    throw error;
+  }
+};
+
 export const userProfileService = {
   getCurrentUserProfile,
   createUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  updateLanguagePreference
 };

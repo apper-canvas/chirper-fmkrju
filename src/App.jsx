@@ -97,7 +97,15 @@ function App() {
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
             
             if (redirectPath) {
-                dispatch(setLanguage(localStorage.getItem('language') || 'English (US)'));
+                // Load language from localStorage if available
+                const storedLanguage = localStorage.getItem('language');
+                if (storedLanguage) {
+                    dispatch(setLanguage(storedLanguage));
+                } else {
+                    // Set default language and save to localStorage
+                    dispatch(setLanguage('English (US)'));
+                    localStorage.setItem('language', 'English (US)');
+                }
                 navigate(redirectPath);
             } else if (!isAuthPage) {
                 if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
@@ -113,6 +121,9 @@ function App() {
             const storedLanguage = localStorage.getItem('language');
             if (storedLanguage) {
                 dispatch(setLanguage(storedLanguage));
+            } else {
+                dispatch(setLanguage('English (US)'));
+                localStorage.setItem('language', 'English (US)');
             }
             
             // Store user information in Redux
