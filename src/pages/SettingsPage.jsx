@@ -262,7 +262,7 @@ const SettingsPage = () => {
           >
             <span className={`${accountSettings.twoFactorAuth ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition`}></span>
           </button>
-        </div>
+        </div> 
 
         <div className="flex items-center justify-between">
           <div>
@@ -280,12 +280,11 @@ const SettingsPage = () => {
               onChange={(e) => handleAccountChange('language', e.target.value)}
               style={{ opacity: isLoading ? 0.7 : 1 }}
             >
-          >
-            <option value="English (US)">English (US)</option>
-            <option value="Spanish">Spanish</option>
-            <option value="French">French</option>
-            <option value="German">German</option>
-            </select>
+              <option value="English (US)">English (US)</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+          </select>
           </div>
         </div>
 

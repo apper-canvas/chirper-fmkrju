@@ -53,11 +53,21 @@ function App() {
   }, [darkMode]);
   
   // Set document language based on selected language
+  // This effect runs when language changes in Redux
   useEffect(() => {
     // Map language names to ISO language codes
     const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
     document.documentElement.lang = languageMap[language] || 'en';
-  }, [language]);
+    
+    // Update title based on selected language
+    const titles = {
+      'English (US)': 'Chirper - Share your thoughts',
+      'Spanish': 'Chirper - Comparte tus pensamientos',
+      'French': 'Chirper - Partagez vos pensées',
+      'German': 'Chirper - Teilen Sie Ihre Gedanken'
+    };
+    document.title = titles[language] || titles['English (US)'];
+  }, [language]); 
 
   // Initialize ApperUI once when the app loads
   useEffect(() => {
@@ -85,14 +95,9 @@ function App() {
         if (user) {
             // User is authenticated
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
+            
             if (redirectPath) {
-                // Get stored language preference if any
-                const storedLanguage = localStorage.getItem('language');
-                if (storedLanguage) {
-                  dispatch(setLanguage(storedLanguage));
-                } else {
-                  localStorage.setItem('language', 'English (US)');
-                }
+                dispatch(setLanguage(localStorage.getItem('language') || 'English (US)'));
                 navigate(redirectPath);
             } else if (!isAuthPage) {
                 if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
@@ -100,9 +105,17 @@ function App() {
                 } else {
                     navigate('/dashboard');
                 }
+            } else {
+                navigate('/dashboard');
             }
+            
+            // Always ensure language is set properly
+            const storedLanguage = localStorage.getItem('language');
+            if (storedLanguage) {
+                dispatch(setLanguage(storedLanguage));
+            }
+            
             // Store user information in Redux
-            dispatch(setUser(JSON.parse(JSON.stringify(user))));
         } else {
             // User is not authenticated
             if (!isAuthPage) {

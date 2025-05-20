@@ -14,6 +14,9 @@ export const settingsSlice = createSlice({
     setLanguage: (state, action) => {
       state.language = action.payload;
       localStorage.setItem('language', action.payload);
+      // Update document language immediately
+      const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
+      document.documentElement.lang = languageMap[action.payload] || 'en';
     },
     setSettingsLoading: (state, action) => {
       state.isLoading = action.payload;

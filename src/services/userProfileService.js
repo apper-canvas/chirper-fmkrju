@@ -207,33 +207,51 @@ class UserProfileService {
    * @param {number} userId - User ID
    * @param {string} language - Selected language
    * @returns {Promise<Object>} Result of the operation
-   */
-  async updateLanguagePreference(userId, language) {
+   */ 
+  async updateLanguagePreference(userIdentifier, language) {
     try {
       const client = apperService.getClient();
       
-      // First try to get the user profile
-      const userProfile = await this.getUserProfileByUsername(userId);
-      
-      if (!userProfile || !userProfile.Id) {
-        throw new Error("User profile not found");
+      try {
+        // First try to get the user profile
+        const userProfile = await this.getUserProfileByUsername(userIdentifier);
+        
+        if (userProfile && userProfile.Id) {
+          // Profile exists, update it
+          const params = {
+            records: [{
+              Id: userProfile.Id,
+              Name: `User Profile - ${language}` // Store language in Name field
+            }]
+          };
+          
+          return await client.updateRecord(this.tableName, params);
+        } else {
+          throw new Error("Profile not found, will create new");
+        }
+      } catch (error) {
+        // If user profile doesn't exist, create a new one
+        console.log("Creating new user profile with language preference", error);
+        
+        const params = {
+          records: [{
+            username: userIdentifier,
+            display_name: userIdentifier.split('@')[0] || 'User',
+            Name: `User Profile - ${language}`,
+            join_date: new Date().toISOString(),
+            following: 0,
+            followers: 0,
+            verified: false
+          }]
+        };
+        
+        return await client.createRecord(this.tableName, params);
       }
-      
-      // Update the user profile with language preference
-      // We'll store this in the Name field as it's the most appropriate for this demo
-      const params = {
-        records: [{
-          Id: userProfile.Id,
-          Name: `User Profile - ${language}` // Store language in Name field
-        }]
-      };
-      
-      return await client.updateRecord(this.tableName, params);
+
     } catch (error) {
-      console.error(`Error updating language preference for user ${userId}:`, error);
+      console.error(`Error updating language preference for user ${userIdentifier}:`, error);
       throw error;
     }
   }
-}
 
 export const userProfileService = new UserProfileService();
