@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './store/userSlice';
 import { ToastContainer, toast } from 'react-toastify';
+import { setLanguage } from './store/settingsSlice';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import Home from './pages/Home';
 import Search from './pages/Search';
@@ -31,6 +32,7 @@ function App() {
   // Get authentication status with proper error handling
   const userState = useSelector((state) => state.user);
   const isAuthenticated = userState?.isAuthenticated || false;
+  const { language } = useSelector((state) => state.settings);
 
   const [darkMode, setDarkMode] = useState(() => {  
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -49,6 +51,13 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+  
+  // Set document language based on selected language
+  useEffect(() => {
+    // Map language names to ISO language codes
+    const languageMap = { 'English (US)': 'en', 'Spanish': 'es', 'French': 'fr', 'German': 'de' };
+    document.documentElement.lang = languageMap[language] || 'en';
+  }, [language]);
 
   // Initialize ApperUI once when the app loads
   useEffect(() => {
@@ -77,6 +86,13 @@ function App() {
             // User is authenticated
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
             if (redirectPath) {
+                // Get stored language preference if any
+                const storedLanguage = localStorage.getItem('language');
+                if (storedLanguage) {
+                  dispatch(setLanguage(storedLanguage));
+                } else {
+                  localStorage.setItem('language', 'English (US)');
+                }
                 navigate(redirectPath);
             } else if (!isAuthPage) {
                 if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {

@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { setLanguage, setSettingsLoading, setSettingsError } from '../store/settingsSlice';
+import { userProfileService } from '../services/userProfileService';
 import getIcon from '../utils/iconUtils';
 
 const SettingsPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [activeSection, setActiveSection] = useState('appearance');
   const [fontSize, setFontSize] = useState(localStorage.getItem('fontSize') || 'medium');
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
+  const { language, isLoading } = useSelector((state) => state.settings);
   const [notificationSettings, setNotificationSettings] = useState({
+
     mentions: true,
     replies: true,
     likes: true,
@@ -28,7 +36,7 @@ const SettingsPage = () => {
     connectedApps: true,
     autoplayVideos: true,
     dataUsage: 'high',
-    language: 'English (US)'
+    language: language
   });
 
   // Icons
@@ -41,6 +49,7 @@ const SettingsPage = () => {
   const UserIcon = getIcon('User');
   const PaletteIcon = getIcon('Palette');
   const ChevronDownIcon = getIcon('ChevronDown');
+  const LoaderIcon = getIcon('Loader');
 
   // Initialize font size from localStorage on mount
   useEffect(() => {
@@ -50,6 +59,11 @@ const SettingsPage = () => {
       applyFontSize(savedFontSize);
     }
   }, []);
+
+  // Update account settings when language changes in Redux
+  useEffect(() => {
+    setAccountSettings(prev => ({ ...prev, language: language }));
+  }, [language]);
 
   const handleFontSizeChange = (e) => {
     const newSize = e.target.value;
@@ -97,11 +111,30 @@ const SettingsPage = () => {
       [setting]: !privacySettings[setting]
     });
   };
-
+  const handleAccountChange = async (setting, value) => {
+    const newValue = typeof value === 'boolean' ? !accountSettings[setting] : value;
+    
   const handleAccountChange = (setting, value) => {
     setAccountSettings({
-      ...accountSettings,
+      [setting]: newValue
       [setting]: typeof value === 'boolean' ? !accountSettings[setting] : value
+    
+    // For language setting, update Redux and save to database
+    if (setting === 'language') {
+      dispatch(setSettingsLoading(true));
+      try {
+        // Get current user from Redux store
+        const user = JSON.parse(localStorage.getItem('user'));
+        await userProfileService.updateLanguagePreference(user?.emailAddress || 'unknown', newValue);
+        dispatch(setLanguage(newValue));
+        toast.success(`Language changed to ${newValue}`);
+      } catch (error) {
+        dispatch(setSettingsError(error.message));
+        toast.error(`Failed to update language: ${error.message}`);
+      } finally {
+        dispatch(setSettingsLoading(false));
+      }
+    }
     });
   };
 
@@ -237,9 +270,15 @@ const SettingsPage = () => {
             <p className="text-sm text-surface-600 dark:text-surface-400">Select your preferred language</p>
           </div>
           <select 
-            className="px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg"
+            className="px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg transition-opacity"
             value={accountSettings.language}
+            disabled={isLoading}
             onChange={(e) => handleAccountChange('language', e.target.value)}
+            style={{ opacity: isLoading ? 0.7 : 1 }}
+          >
+            {isLoading && (
+              <LoaderIcon className="animate-spin w-4 h-4 mr-2" />
+            )}
           >
             <option value="English (US)">English (US)</option>
             <option value="Spanish">Spanish</option>
@@ -248,7 +287,9 @@ const SettingsPage = () => {
           </select>
         </div>
 
-        <button className="w-full p-3 mt-4 bg-accent hover:bg-opacity-90 text-white rounded-lg">
+        <button 
+          onClick={() => { navigate('/login'); window.location.reload(); }}
+          className="w-full p-3 mt-4 bg-accent hover:bg-opacity-90 text-white rounded-lg">
           Sign Out
         </button>
       </div>

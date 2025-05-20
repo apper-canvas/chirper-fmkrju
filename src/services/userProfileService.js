@@ -201,6 +201,39 @@ class UserProfileService {
       throw error;
     }
   }
+
+  /**
+   * Update user language preference
+   * @param {number} userId - User ID
+   * @param {string} language - Selected language
+   * @returns {Promise<Object>} Result of the operation
+   */
+  async updateLanguagePreference(userId, language) {
+    try {
+      const client = apperService.getClient();
+      
+      // First try to get the user profile
+      const userProfile = await this.getUserProfileByUsername(userId);
+      
+      if (!userProfile || !userProfile.Id) {
+        throw new Error("User profile not found");
+      }
+      
+      // Update the user profile with language preference
+      // We'll store this in the Name field as it's the most appropriate for this demo
+      const params = {
+        records: [{
+          Id: userProfile.Id,
+          Name: `User Profile - ${language}` // Store language in Name field
+        }]
+      };
+      
+      return await client.updateRecord(this.tableName, params);
+    } catch (error) {
+      console.error(`Error updating language preference for user ${userId}:`, error);
+      throw error;
+    }
+  }
 }
 
 export const userProfileService = new UserProfileService();

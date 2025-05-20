@@ -4,6 +4,7 @@ import userReducer from './userSlice';
 import chirpsReducer from './chirpsSlice';
 import userProfilesReducer from './userProfilesSlice';
 import savedItemsReducer from './savedItemsSlice';
+import settingsReducer from './settingsSlice';
  
  export const store = configureStore({
    reducer: {
@@ -11,7 +12,8 @@ import savedItemsReducer from './savedItemsSlice';
     user: userReducer,
     chirps: chirpsReducer,
     userProfiles: userProfilesReducer,
-    savedItems: savedItemsReducer
+    savedItems: savedItemsReducer,
+    settings: settingsReducer
    },
   devTools: process.env.NODE_ENV !== 'production' || true,
  });
