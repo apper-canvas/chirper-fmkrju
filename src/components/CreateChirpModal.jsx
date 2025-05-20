@@ -14,7 +14,6 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
   const modalRef = useRef(null);
-  const modalRef = useRef(null);
   
   const MAX_CHARS = 280;
   const remainingChars = MAX_CHARS - chirpText.length;
@@ -102,7 +101,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       toast.error("Failed to create chirp: " + error.message);
     } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
   
   const handleAddEmoji = (emoji) => {
