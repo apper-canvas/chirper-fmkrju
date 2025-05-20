@@ -2,8 +2,9 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
-import { saveItem } from '../store/savedItemsSlice';
+import { saveItem as saveItemAction } from '../store/savedItemsSlice';
 import getIcon from '../utils/iconUtils';
+import { savedItemService } from '../services/savedItemService';
 
 const ChirpList = ({ chirps, isLoading, error }) => {
   const dispatch = useDispatch();
@@ -33,15 +34,25 @@ const ChirpList = ({ chirps, isLoading, error }) => {
     }
   };
   
-  const handleSaveChirp = (chirp) => {
-    dispatch(saveItem({ chirpId: chirp.Id }))
-      .unwrap()
-      .then(() => {
-        toast.success('Chirp saved to bookmarks');
-      })
-      .catch((err) => {
+  const handleSaveChirp = async (chirp) => {
+    try {
+      // First try to save using the service
+      await savedItemService.saveItem({ chirpId: chirp.Id });
+      
+      // If successful, update Redux state
+      dispatch(saveItemAction({ chirpId: chirp.Id }));
+      
+      // Show success message
+      toast.success('Chirp saved to bookmarks');
+    } catch (err) {
+      // Show error message
+      console.error("Error saving chirp:", err);
+      try {
         toast.error('Failed to save chirp');
-      });
+      } catch (toastError) {
+        console.error("Error showing toast:", toastError);
+      }
+    }
   };
   
   if (isLoading && chirps.length === 0) {
@@ -142,5 +153,4 @@ const ChirpList = ({ chirps, isLoading, error }) => {
     </div>
   );
 };
-
 export default ChirpList;

@@ -1,107 +1,116 @@
-import { apperService } from './apperService';
-
 /**
- * Service for followed users operations
+ * Service for interacting with the followed_user table in the Apper backend
  */
-class FollowedUserService {
-  constructor() {
-    this.tableName = 'followed_user';
-  }
-  
-  /**
-   * Fetch followed users
-   * @param {Object} options - Query options
-   * @returns {Promise<Array>} Array of followed users
-   */
-  async getFollowedUsers(options = {}) {
-    try {
-      const client = apperService.getClient();
-      
-      const params = {
-        Fields: [
-          { Field: { Name: 'Id' } },
-          { Field: { Name: 'username' } },
-          { Field: { Name: 'display_name' } },
-          { Field: { Name: 'avatar' } },
-          { Field: { Name: 'is_verified' } }
-        ],
-        pagingInfo: {
-          limit: options.limit || 20,
-          offset: options.offset || 0
-        }
-      };
-      
-      const response = await client.fetchRecords(this.tableName, params);
-      
-      if (!response || !response.data) {
-        return [];
-      }
-      
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching followed users:", error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Follow a user
-   * @param {Object} userData - User data to follow
-   * @returns {Promise<Object>} Created follow relationship
-   */
-  async followUser(userData) {
-    try {
-      const client = apperService.getClient();
-      
-      const params = {
-        records: [
-          {
-            username: userData.username,
-            display_name: userData.displayName,
-            avatar: userData.avatar || null,
-            is_verified: userData.isVerified || false
-          }
-        ]
-      };
-      
-      const response = await client.createRecord(this.tableName, params);
-      
-      if (!response || !response.success || !response.results || response.results.length === 0) {
-        throw new Error("Failed to follow user");
-      }
-      
-      return response.results[0].data;
-    } catch (error) {
-      console.error("Error following user:", error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Unfollow a user
-   * @param {number} id - Followed user record ID
-   * @returns {Promise<boolean>} Success status
-   */
-  async unfollowUser(id) {
-    try {
-      const client = apperService.getClient();
-      
-      const params = {
-        RecordIds: [id]
-      };
-      
-      const response = await client.deleteRecord(this.tableName, params);
-      
-      if (!response || !response.success) {
-        throw new Error("Failed to unfollow user");
-      }
-      
-      return true;
-    } catch (error) {
-      console.error(`Error unfollowing user ${id}:`, error);
-      throw error;
-    }
-  }
-}
 
-export const followedUserService = new FollowedUserService();
+const fetchFollowedUsers = async (userId) => {
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    // Query followed users by owner
+    const params = {
+      where: [
+        {
+          fieldName: "Owner",
+          operator: "ExactMatch",
+          values: [userId]
+        }
+      ]
+    };
+
+    const response = await apperClient.fetchRecords("followed_user", params);
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching followed users:", error);
+    throw error;
+  }
+};
+
+const checkIfFollowing = async (userId, username) => {
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    // Query followed users by owner and username
+    const params = {
+      where: [
+        {
+          fieldName: "Owner",
+          operator: "ExactMatch",
+          values: [userId]
+        },
+        {
+          fieldName: "username",
+          operator: "ExactMatch",
+          values: [username]
+        }
+      ]
+    };
+
+    const response = await apperClient.fetchRecords("followed_user", params);
+    return response.data && response.data.length > 0;
+  } catch (error) {
+    console.error("Error checking follow status:", error);
+    throw error;
+  }
+};
+
+const followUser = async (userData) => {
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    // Only include Updateable fields
+    const params = {
+      records: [{
+        Name: userData.display_name || userData.username,
+        username: userData.username,
+        display_name: userData.display_name || "",
+        avatar: userData.avatar || "",
+        is_verified: userData.is_verified || false
+      }]
+    };
+
+    const response = await apperClient.createRecord("followed_user", params);
+    return response.results?.[0]?.data || null;
+  } catch (error) {
+    console.error("Error following user:", error);
+    throw error;
+  }
+};
+
+const unfollowUser = async (followId) => {
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    const params = {
+      RecordIds: [followId]
+    };
+
+    await apperClient.deleteRecord("followed_user", params);
+    return true;
+  } catch (error) {
+    console.error(`Error unfollowing user with ID ${followId}:`, error);
+    throw error;
+  }
+};
+
+export const followedUserService = {
+  fetchFollowedUsers,
+  checkIfFollowing,
+  followUser,
+  unfollowUser
+};

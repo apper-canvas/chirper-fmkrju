@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { chirpService } from '../services/chirpService';
 import getIcon from '../utils/iconUtils';
 
 const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
-  const [chirpText, setChirpText] = useState('');
+  const [chirpText, setChirpText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedTab, setSelectedTab] = useState('text');
   const [previewImage, setPreviewImage] = useState(null);
@@ -12,6 +13,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
+  const modalRef = useRef(null);
   const modalRef = useRef(null);
   
   const MAX_CHARS = 280;
@@ -59,30 +61,47 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
     setChirpText(e.target.value);
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isDisabled) return;
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      onAddChirp({
-        text: chirpText,
+    try {
+      // Prepare chirp data
+      const user = JSON.parse(localStorage.getItem('user'));
+      const chirpData = {
+        Name: "New Chirp",
+        content: chirpText,
         image: previewImage,
+        username: user?.username || "user",
+        display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        likes: 0,
+        rechirps: 0,
+        replies: 0,
+        views: "0",
+        is_liked: false,
+        category: "technology"
+      };
+      
+      // Create chirp in database
+      const newChirp = await chirpService.createChirp(chirpData);
+      
+      // Call parent component's callback with the created chirp
+      onAddChirp({
+        ...newChirp,
+        text: chirpText,
         timestamp: new Date().toISOString()
       });
       
-      setChirpText('');
+      toast.success("Your chirp has been posted!");
+      setChirpText("");
       setPreviewImage(null);
-      setIsLoading(false);
-      setSelectedTab('text');
-      
-      toast.success("Your chirp has been posted!", {
-        position: "bottom-right",
-        autoClose: 3000
-      });
-      
       onClose();
+    } catch (error) {
+      toast.error("Failed to create chirp: " + error.message);
+    } finally {
+      setIsLoading(false);
     }, 1000);
   };
   
@@ -257,5 +276,4 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
     </AnimatePresence>
   );
 };
-
 export default CreateChirpModal;

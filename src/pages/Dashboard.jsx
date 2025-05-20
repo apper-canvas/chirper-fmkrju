@@ -1,12 +1,13 @@
 import { useEffect, useState, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { fetchChirps } from '../store/chirpsSlice';
+import { fetchChirps as fetchChirpsAction } from '../store/chirpsSlice';
 import { AuthContext } from '../App';
 import ChirpList from '../components/ChirpList';
 import getIcon from '../utils/iconUtils';
+import { chirpService } from '../services/chirpService';
 
-const Dashboard = () => {
+const Dashboard = React.useCallback(() => {
   const dispatch = useDispatch();
   const { logout } = useContext(AuthContext);
   const user = useSelector(state => state.user.user);
@@ -15,18 +16,42 @@ const Dashboard = () => {
 
   const LogoutIcon = getIcon('LogOut');
 
-  useEffect(() => {
-    dispatch(fetchChirps({ limit: 10 }));
+  // Fetch chirps when component mounts
+  useEffect(() => {    
+    const loadChirps = async () => {
+      try {
+        const chirpsData = await chirpService.fetchChirps({ limit: 10 });
+        dispatch(fetchChirpsAction(chirpsData));
+      } catch (error) {
+        console.error("Error loading chirps:", error);
+        // We could show a toast here if needed
+      }
+    };
+    
+    loadChirps();
   }, [dispatch]);
 
-  const handleLoadMore = () => {
+  // Handle loading more chirps
+  const handleLoadMore = async () => {
     setIsLoadingMore(true);
-    dispatch(fetchChirps({ 
-      limit: 10, 
-      offset: chirps.length 
-    })).finally(() => {
+    
+    try {
+      const moreChirps = await chirpService.fetchChirps({
+        limit: 10,
+        offset: chirps.length
+      });
+      
+      if (moreChirps && moreChirps.length > 0) {
+        dispatch(fetchChirpsAction([...chirps, ...moreChirps]));
+      } else {
+        toast.info("No more chirps to load");
+      }
+    } catch (error) {
+      console.error("Error loading more chirps:", error);
+      toast.error("Failed to load more chirps");
+    } finally {
       setIsLoadingMore(false);
-    });
+    }
   };
 
   return (
@@ -96,5 +121,3 @@ const Dashboard = () => {
     </div>
   );
 };
-
-export default Dashboard;

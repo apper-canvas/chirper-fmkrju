@@ -1,31 +1,26 @@
 /**
- * Central service for Apper client initialization and configuration
+ * Service for common ApperClient operations
  */
 
-class ApperService {
-  constructor() {
-    this.client = null;
-    this.initialized = false;
-  }
+// Initialize Apper client with environment variables
+const initializeApperClient = () => {
+  const { ApperClient } = window.ApperSDK;
+  return new ApperClient({
+    apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+    apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+  });
+};
 
-  initialize() {
-    if (this.initialized) {
-      return this.client;
-    }
-    
-    const { ApperClient } = window.ApperSDK;
-    this.client = new ApperClient({
-      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
-    
-    this.initialized = true;
-    return this.client;
+// Get the current authenticated user from localStorage
+const getCurrentUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user'));
+  } catch (e) {
+    return null;
   }
+};
 
-  getClient() {
-    return this.initialize();
-  }
-}
-
-export const apperService = new ApperService();
+export const apperService = {
+  initializeApperClient,
+  getCurrentUser
+};

@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
+import { chirpService } from '../services/chirpService';
 
 const MainFeature = ({ onAddChirp }) => {
   const [chirpText, setChirpText] = useState('');
@@ -47,19 +48,41 @@ const MainFeature = ({ onAddChirp }) => {
     setChirpText(e.target.value);
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isDisabled) return;
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      onAddChirp(chirpText);
+    try {
+      // Prepare chirp data
+      const user = JSON.parse(localStorage.getItem('user'));
+      const chirpData = {
+        Name: "New Chirp",
+        content: chirpText,
+        image: previewImage,
+        username: user?.username || "user",
+        display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        likes: 0,
+        rechirps: 0,
+        replies: 0,
+        views: "0",
+        is_liked: false,
+        category: "technology"
+      };
+      
+      // Create chirp in database
+      const newChirp = await chirpService.createChirp(chirpData);
+      
+      onAddChirp(newChirp?.content || chirpText);
+      toast.success("Your chirp has been posted!");
+    } catch (error) {
+      toast.error("Failed to create chirp: " + error.message);
+    } finally {
+      setIsLoading(false);
       setChirpText('');
       setPreviewImage(null);
-      setIsLoading(false);
-      setSelectedTab('text');
-    }, 1000);
+    }
   };
   
   const handleAddEmoji = (emoji) => {
@@ -334,5 +357,4 @@ const MainFeature = ({ onAddChirp }) => {
     </div>
   );
 };
-
 export default MainFeature;
