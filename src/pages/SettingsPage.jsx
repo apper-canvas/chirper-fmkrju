@@ -269,21 +269,24 @@ const SettingsPage = () => {
             <h3 className="font-semibold">Language</h3>
             <p className="text-sm text-surface-600 dark:text-surface-400">Select your preferred language</p>
           </div>
-          <select 
-            className="px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg transition-opacity"
-            value={accountSettings.language}
-            disabled={isLoading}
-            onChange={(e) => handleAccountChange('language', e.target.value)}
-            style={{ opacity: isLoading ? 0.7 : 1 }}
-          >
-            {isLoading && (
-              <LoaderIcon className="animate-spin w-4 h-4 mr-2" />)}
+          <div className="flex items-center">
+            {isLoading && 
+              <LoaderIcon className="animate-spin w-4 h-4 mr-2" />
+            }
+            <select 
+              className="px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg transition-opacity"
+              value={accountSettings.language}
+              disabled={isLoading}
+              onChange={(e) => handleAccountChange('language', e.target.value)}
+              style={{ opacity: isLoading ? 0.7 : 1 }}
+            >
           >
             <option value="English (US)">English (US)</option>
             <option value="Spanish">Spanish</option>
             <option value="French">French</option>
             <option value="German">German</option>
-          </select>
+            </select>
+          </div>
         </div>
 
         <button 
