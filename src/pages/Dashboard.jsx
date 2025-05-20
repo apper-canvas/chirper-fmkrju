@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -6,8 +7,9 @@ import { AuthContext } from '../App';
 import ChirpList from '../components/ChirpList';
 import getIcon from '../utils/iconUtils';
 import { chirpService } from '../services/chirpService';
+import { toast } from 'react-toastify';
 
-const Dashboard = React.useCallback(() => {
+const Dashboard = () => {
   const dispatch = useDispatch();
   const { logout } = useContext(AuthContext);
   const user = useSelector(state => state.user.user);
@@ -121,3 +123,5 @@ const Dashboard = React.useCallback(() => {
     </div>
   );
 };
+
+export default Dashboard;
