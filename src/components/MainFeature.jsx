@@ -57,7 +57,7 @@ const MainFeature = ({ onAddChirp }) => {
       // Prepare chirp data
       const user = JSON.parse(localStorage.getItem('user'));
       const chirpData = {
-        Name: "New Chirp",
+        Name: "New Chirp", // Matching exact field name in the database schema
         content: chirpText,
         image: previewImage,
         username: user?.username || "user",
@@ -72,16 +72,26 @@ const MainFeature = ({ onAddChirp }) => {
       };
       
       // Create chirp in database
-      const newChirp = await chirpService.createChirp(chirpData);
+      try {
+        const newChirp = await chirpService.createChirp(chirpData);
+        
+        if (newChirp) {
+          onAddChirp(newChirp);
+          toast.success("Your chirp has been posted!");
+          setChirpText('');
+          setPreviewImage(null);
+        } else {
+          throw new Error("No data returned from chirp creation");
+        }
+      } catch (error) {
+        console.error("Error in createChirp:", error);
+        toast.error(error.message || "Failed to create chirp");
+      }
       
-      onAddChirp(newChirp?.content || chirpText);
-      toast.success("Your chirp has been posted!");
     } catch (error) {
-      toast.error("Failed to create chirp: " + error.message);
+      toast.error("Failed to create chirp: " + (error.message || "Unknown error"));
     } finally {
       setIsLoading(false);
-      setChirpText('');
-      setPreviewImage(null);
     }
   };
   

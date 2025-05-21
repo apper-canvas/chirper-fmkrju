@@ -79,9 +79,8 @@ const createChirp = async (chirpData) => {
     const params = {
       records: [{
         Name: chirpData.name || "New Chirp",
-        location: chirpData.location || "",
         Tags: chirpData.tags || "",
-        content: chirpData.content || "",
+        content: chirpData.content || chirpData.text || "",
         image: chirpData.image || "",
         username: chirpData.username || "",
         display_name: chirpData.display_name || "",
@@ -96,10 +95,25 @@ const createChirp = async (chirpData) => {
       }]
     };
 
-    const response = await apperClient.createRecord("chirp1", params);
-    return response.results?.[0]?.data || null;
+    try {
+      const response = await apperClient.createRecord("chirp1", params);
+      
+      if (!response || !response.results || response.results.length === 0) {
+        throw new Error("No response data returned when creating chirp");
+      }
+      
+      const result = response.results[0];
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create chirp");
+      }
+      
+      return result.data;
+    } catch (error) {
+      console.error("Error creating chirp:", error);
+      throw new Error(`Failed to create chirp: ${error.message}`);
+    }
   } catch (error) {
-    console.error("Error creating chirp:", error);
+    console.error("Error in chirp service:", error);
     throw error;
   }
 };
