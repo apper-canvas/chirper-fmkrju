@@ -84,18 +84,17 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         replies: 0,
         views: "0",
         is_liked: false,
-      console.log("Creating new chirp with data:", chirpData);
         category: "technology"
       };
+        verified: false,
       console.log("Created chirp:", newChirp);
       
       // Create chirp in database
       const newChirp = await chirpService.createChirp(chirpData);
       
-      // Call parent component's callback with the created chirp
-        content: chirpText,
+      console.log("Created chirp:", newChirp);
       onAddChirp({
-        ...newChirp,
+        content: chirpText,
         text: chirpText,
         timestamp: new Date().toISOString()
       });
