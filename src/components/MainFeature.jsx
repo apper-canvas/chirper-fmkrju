@@ -109,6 +109,8 @@ const MainFeature = ({ onAddChirp }) => {
         toast.error("Failed to create chirp: " + errorMsg);
       }
       
+      setIsLoading(false);
+    } catch (error) {
       toast.error("Error creating chirp: " + (error.message || "Unknown error"));
       setIsLoading(false);
     }
