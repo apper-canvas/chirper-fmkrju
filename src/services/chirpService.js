@@ -70,7 +70,7 @@ const getChirpById = async (chirpId) => {
 const createChirp = async (chirpData) => {
   try {
     const { ApperClient } = window.ApperSDK;
-    const apperClient = new ApperClient({
+    const apperClient = new ApperClient({ 
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
@@ -91,27 +91,22 @@ const createChirp = async (chirpData) => {
         replies: chirpData.replies || 0,
         views: chirpData.views || "0",
         is_liked: chirpData.is_liked || false,
-        category: chirpData.category || "technology"
-      }]
-    };
-
-    try {
-      const response = await apperClient.createRecord("chirp1", params);
-      
-      if (!response || !response.results || response.results.length === 0) {
-        throw new Error("No response data returned when creating chirp");
-      }
-      
-      const result = response.results[0];
-      if (!result.success) {
-        throw new Error(result.message || "Failed to create chirp");
-      }
-      
-      return result.data;
+    
+    const response = await apperClient.createRecord("chirp1", params);
+    
+    if (!response || !response.results || response.results.length === 0) {
+      throw new Error("No response data returned when creating chirp");
     } catch (error) {
-      console.error("Error creating chirp:", error);
-      throw new Error(`Failed to create chirp: ${error.message}`);
+    
+    const result = response.results[0];
+    if (!result.success) {
+      throw new Error(result.message || "Failed to create chirp");
     }
+    
+    return result.data;
+      console.error("Error creating chirp:", error);
+    console.error("Error creating chirp:", error);
+    throw new Error(`Failed to create chirp: ${error.message || "Unknown error"}`);
   } catch (error) {
     console.error("Error in chirp service:", error);
     throw error;
