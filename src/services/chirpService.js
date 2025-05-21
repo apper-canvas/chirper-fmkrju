@@ -81,7 +81,7 @@ const createChirp = async (chirpData) => {
 
     // Ensure proper formatting for boolean and numeric fields
     const formattedChirpData = {
-      Name: chirpData.name || "New Chirp",
+      Name: chirpData.Name || "New Chirp",
       Tags: chirpData.tags || "",
       content: chirpData.content || "",
       image: chirpData.image || "",
@@ -99,11 +99,12 @@ const createChirp = async (chirpData) => {
 
     // Prepare request payload with records array as expected by API
     const params = {
-      records: [formattedChirpData]
+      records: [formattedChirpData] 
     };
 
     // Create the record in the database
-    console.log("Sending formatted data to Apper backend:", JSON.stringify(params));
+    console.log("Sending formatted data to Apper backend:", JSON.stringify(params, null, 2));
+    console.log("Table fields structure:", "chirp1");
 
     const response = await apperClient.createRecord("chirp1", params);
 

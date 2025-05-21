@@ -83,10 +83,10 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         rechirps: 0,
         replies: 0,
         views: "0",
-        is_liked: false,
+        is_liked: false, 
+        verified: false,
         category: "technology"
       };
-        verified: false,
       console.log("Created chirp:", newChirp);
       
       // Create chirp in database
