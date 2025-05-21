@@ -4,6 +4,13 @@
 @tailwind utilities;
 
 @layer base {
+    --transition-speed: 0.2s;
+    --animation-speed: 1s;
+  }
+  
+  .reduced-animations * {
+    transition-duration: var(--transition-speed) !important;
+    animation-duration: var(--animation-speed) !important;
   body {
     @apply antialiased min-h-screen;
   }

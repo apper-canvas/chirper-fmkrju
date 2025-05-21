@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { setLanguage, setSettingsLoading, setSettingsError } from '../store/settingsSlice';
+import { toast } from 'react-toastify'; 
+import { setLanguage, setSettingsLoading, setSettingsError, toggleReducedAnimations } from '../store/settingsSlice';
 import { userProfileService } from '../services/userProfileService';
 import getIcon from '../utils/iconUtils';
 
@@ -13,7 +13,8 @@ const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState('appearance');
   const [fontSize, setFontSize] = useState(localStorage.getItem('fontSize') || 'medium');
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
-  const { language, isLoading } = useSelector((state) => state.settings);
+  const { language, isLoading, reducedAnimations } = useSelector((state) => state.settings);
+  const [animationsLoading, setAnimationsLoading] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
     mentions: true,
     replies: true,
@@ -54,6 +55,11 @@ const SettingsPage = () => {
   }, []);
 
   // Icons
+  useEffect(() => {
+    // Apply reduced animations setting on mount and when changed
+    applyReducedAnimations(reducedAnimations);
+  }, [reducedAnimations]);
+
   const HomeIcon = getIcon('Home');
   const ChevronLeftIcon = getIcon('ChevronLeft');
   const MoonIcon = getIcon('Moon');
@@ -95,6 +101,25 @@ const SettingsPage = () => {
     setDarkMode(!darkMode);
   };
 
+  const handleToggleReducedAnimations = async () => {
+    setAnimationsLoading(true);
+    try {
+      // Toggle the reduced animations setting in Redux
+      dispatch(toggleReducedAnimations());
+      
+      // Show success notification
+      toast.success(`Animations ${!reducedAnimations ? 'reduced' : 'enabled'}`, {
+        position: "bottom-right"
+      });
+    } catch (error) {
+      toast.error(`Failed to update animation settings: ${error.message}`, {
+        position: "bottom-right"
+      });
+    } finally {
+      setAnimationsLoading(false);
+    }
+  };
+
   const applyFontSize = (size) => {
     // Remove any existing font size classes
     document.documentElement.classList.remove('text-small', 'text-medium', 'text-large');
@@ -109,6 +134,19 @@ const SettingsPage = () => {
       document.documentElement.style.fontSize = '1rem'; // 16px
     } else if (size === 'large') {
       document.documentElement.style.fontSize = '1.125rem'; // 18px
+    }
+  };
+
+  const applyReducedAnimations = (reduced) => {
+    if (reduced) {
+      // Add a class to reduce animations site-wide
+      document.documentElement.classList.add('reduced-animations');
+      document.documentElement.style.setProperty('--transition-speed', '0.01s');
+      document.documentElement.style.setProperty('--animation-speed', '0.01s');
+    } else {
+      document.documentElement.classList.remove('reduced-animations');
+      document.documentElement.style.removeProperty('--transition-speed');
+      document.documentElement.style.removeProperty('--animation-speed');
     }
   };
 
@@ -210,9 +248,11 @@ const SettingsPage = () => {
             <p className="text-sm text-surface-600 dark:text-surface-400">Minimize motion for accessibility</p>
           </div>
           <button 
+            onClick={handleToggleReducedAnimations}
+            disabled={animationsLoading}
             className="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-300 dark:bg-surface-700"
           >
-            <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+            <span className={`${reducedAnimations ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition ${animationsLoading ? 'opacity-50' : ''}`}></span>
           </button>
         </div>
       </div>
