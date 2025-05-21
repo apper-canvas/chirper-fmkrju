@@ -3,9 +3,9 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   language: localStorage.getItem('language') || 'English (US)',
   fontSize: localStorage.getItem('fontSize') || 'medium',
+  isLoading: false,
   error: null,
   reducedAnimations: localStorage.getItem('reducedAnimations') === 'true' || false
-  error: null
 };
 
 export const settingsSlice = createSlice({
@@ -20,18 +20,17 @@ export const settingsSlice = createSlice({
       }
     },
     setSettingsLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
     toggleReducedAnimations: (state) => {
       state.reducedAnimations = !state.reducedAnimations;
       localStorage.setItem('reducedAnimations', state.reducedAnimations);
-      state.isLoading = action.payload;
     },
     setSettingsError: (state, action) => {
       state.error = action.payload;
     }
   }
 });
-  setSettingsError,
-  toggleReducedAnimations
-export const { setLanguage, setSettingsLoading, setSettingsError } = settingsSlice.actions;
+
+export const { setLanguage, setSettingsLoading, setSettingsError, toggleReducedAnimations } = settingsSlice.actions;
 export default settingsSlice.reducer;
