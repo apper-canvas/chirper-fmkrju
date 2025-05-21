@@ -9,6 +9,8 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedTab, setSelectedTab] = useState('text');
   const [previewImage, setPreviewImage] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -73,6 +75,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         content: chirpText,
         image: previewImage,
         username: user?.username || "user",
+        location: location ? location.display : "",
         display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
         likes: 0,
@@ -96,6 +99,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       toast.success("Your chirp has been posted!");
       setChirpText("");
       setPreviewImage(null);
+      setLocation(null);
       onClose();
     } catch (error) {
       toast.error("Failed to create chirp: " + error.message);
@@ -136,6 +140,38 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   
   const removePreviewImage = () => {
     setPreviewImage(null);
+  };
+  
+  const handleLocationClick = () => {
+    if (location) {
+      // If we already have a location, remove it
+      setLocation(null);
+      return;
+    }
+    
+    setLoadingLocation(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Success - we have the location
+          const locationData = {
+            lat: position.coords.latitude,
+            long: position.coords.longitude,
+            display: "Current Location" // Simplified display for demo
+          };
+          setLocation(locationData);
+          setLoadingLocation(false);
+          toast.success("Location added to your chirp");
+        },
+        (error) => {
+          setLoadingLocation(false);
+          toast.error("Unable to access your location: " + error.message);
+        }
+      );
+    } else {
+      setLoadingLocation(false);
+      toast.error("Geolocation is not supported by your browser");
+    }
   };
   
   const handleTabChange = (tab) => {
@@ -231,6 +267,24 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
                       </button>
                     </div>
                     
+                    {/* Hidden file input for image uploads */}
+                    <input 
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      accept="image/*"
+                    />
+                    
+                    {/* Location display */}
+                    {location && (
+                      <div className="mb-3 text-sm flex items-center text-primary bg-primary/10 p-2 rounded-full">
+                        <MapPinIcon className="w-4 h-4 mr-1" />
+                        <span>{location.display}</span>
+                        <button onClick={() => setLocation(null)} className="ml-2"><XIcon className="w-4 h-4" /></button>
+                      </div>
+                    )}
+                    
                     <textarea
                       ref={textareaRef}
                       placeholder="What's happening?"
@@ -259,7 +313,42 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
                 </div>
               </div>
               
-              <div className="p-4 border-t border-surface-200 dark:border-surface-700 flex justify-end">
+              <div className="p-4 border-t border-surface-200 dark:border-surface-700 flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={() => fileInputRef.current.click()}
+                    className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors text-primary"
+                    aria-label="Add image"
+                  >
+                    <ImageIcon className="w-5 h-5" />
+                  </button>
+                  
+                  <button 
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors text-primary"
+                    aria-label="Add emoji"
+                  >
+                    <SmileIcon className="w-5 h-5" />
+                  </button>
+                  
+                  <button 
+                    className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors text-primary"
+                    aria-label="Schedule post"
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                  </button>
+                  
+                  <button 
+                    onClick={handleLocationClick}
+                    className={`p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors ${location ? 'text-primary bg-primary/10' : 'text-primary'}`}
+                    aria-label={location ? "Remove location" : "Add location"}
+                  >
+                    {loadingLocation ? 
+                      <LoaderIcon className="w-5 h-5 animate-spin" /> : 
+                      <MapPinIcon className="w-5 h-5" />}
+                  </button>
+                </div>
+                
                 <button
                   onClick={handleSubmit}
                   disabled={isDisabled}
@@ -270,6 +359,17 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
               </div>
             </div>
           </motion.div>
+          
+          {/* Emoji picker, will show when emoji button is clicked */}
+          {showEmojiPicker && (
+            <div ref={emojiPickerRef} className="absolute bottom-20 left-8 bg-surface-50 dark:bg-surface-800 p-2 rounded-xl shadow-lg border border-surface-200 dark:border-surface-700 z-50">
+              <div className="grid grid-cols-8 gap-1">
+                {emojis.map((emoji, index) => (
+                  <button key={index} onClick={() => handleAddEmoji(emoji)} className="p-2 hover:bg-surface-200 dark:hover:bg-surface-700 rounded">{emoji}</button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </AnimatePresence>

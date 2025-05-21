@@ -79,6 +79,7 @@ const createChirp = async (chirpData) => {
     const params = {
       records: [{
         Name: chirpData.name || "New Chirp",
+        location: chirpData.location || "",
         Tags: chirpData.tags || "",
         content: chirpData.content || "",
         image: chirpData.image || "",
