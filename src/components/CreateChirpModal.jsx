@@ -64,7 +64,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   
   const handleSubmit = async () => {
     if (isDisabled) return;
-    
+
     setIsLoading(true);
     
     try {
@@ -73,6 +73,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       const chirpData = {
         Name: "New Chirp",
         content: chirpText,
+        text: chirpText, // Include for compatibility
         image: previewImage,
         username: user?.username || "user",
         location: location ? location.display : "",
@@ -83,13 +84,16 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         replies: 0,
         views: "0",
         is_liked: false,
+      console.log("Creating new chirp with data:", chirpData);
         category: "technology"
       };
+      console.log("Created chirp:", newChirp);
       
       // Create chirp in database
       const newChirp = await chirpService.createChirp(chirpData);
       
       // Call parent component's callback with the created chirp
+        content: chirpText,
       onAddChirp({
         ...newChirp,
         text: chirpText,
@@ -102,6 +106,7 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       setLocation(null);
       onClose();
     } catch (error) {
+      console.error("Error creating chirp:", error);
       toast.error("Failed to create chirp: " + error.message);
     } finally {
       setIsLoading(false);

@@ -13,7 +13,7 @@ export const fetchChirps = createAsyncThunk(
   'chirps/fetchChirps',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await chirpService.getChirps(params);
+      const response = await chirpService.fetchChirps(params);
       return response;
     } catch (error) {
       return rejectWithValue(error.message);

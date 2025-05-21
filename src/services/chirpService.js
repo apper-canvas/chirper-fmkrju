@@ -70,13 +70,14 @@ const getChirpById = async (chirpId) => {
 const createChirp = async (chirpData) => {
   try {
     // Initialize ApperClient
+    console.log("Creating chirp with data:", chirpData);
     const { ApperClient } = window.ApperSDK;
     const apperClient = new ApperClient({
        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
      });
 
-    // Only include Updateable fields
+    // Only include Updateable fields and ensure proper data formatting
     const params = {
       records: [{
          Name: chirpData.name || "New Chirp",
@@ -86,9 +87,9 @@ const createChirp = async (chirpData) => {
          username: chirpData.username || "",
          display_name: chirpData.display_name || "",
          avatar: chirpData.avatar || "",
-         verified: chirpData.verified || false,
-         likes: chirpData.likes || 0,
-         rechirps: chirpData.rechirps || 0,
+         verified: Boolean(chirpData.verified) || false,
+         likes: Number(chirpData.likes || 0),
+         rechirps: Number(chirpData.rechirps || 0),
          replies: chirpData.replies || 0,
          views: chirpData.views || "0",
          is_liked: chirpData.is_liked || false,
@@ -97,6 +98,7 @@ const createChirp = async (chirpData) => {
      };
 
     // Create the record in the database
+    console.log("Sending to Apper backend:", params);
     const response = await apperClient.createRecord("chirp1", params);
 
     if (!response || !response.results || response.results.length === 0) {
@@ -108,9 +110,10 @@ const createChirp = async (chirpData) => {
       throw new Error(result.message || "Failed to create chirp");
     }
 
+    console.log("Chirp created successfully:", result.data);
     return result.data;
   } catch (error) {
-    console.error("Error in chirp service:", error);
+    console.error("Error creating chirp in service:", error);
     throw error;
   }
 };
