@@ -37,6 +37,7 @@ export const createChirp = createAsyncThunk(
   'chirps/createChirp',
   async (chirpData, { rejectWithValue }) => {
     try {
+      console.log("createChirp thunk with data:", chirpData);
       const response = await chirpService.createChirp(chirpData);
       return response;
     } catch (error) {
@@ -90,7 +91,13 @@ const chirpsSlice = createSlice({
       })
       .addCase(createChirp.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.chirps.unshift(action.payload);
+        // Check if payload exists before trying to add it
+        if (action.payload) {
+          // Add the new chirp to the beginning of the array
+          if (Array.isArray(state.chirps)) {
+            state.chirps.unshift(action.payload);
+          }
+        }
         state.error = null;
       })
       .addCase(createChirp.rejected, (state, action) => {

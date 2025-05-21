@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
-import { chirpService } from '../services/chirpService';
+import { createChirp } from '../store/chirpsSlice';
 
 const MainFeature = ({ onAddChirp }) => {
   const [chirpText, setChirpText] = useState('');
@@ -15,6 +16,10 @@ const MainFeature = ({ onAddChirp }) => {
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
+
+  // Redux
+  const dispatch = useDispatch();
+  const { isLoading: isReduxLoading, error: chirpError } = useSelector(state => state.chirps);
   
   const MAX_CHARS = 280;
   const remainingChars = MAX_CHARS - chirpText.length;
@@ -44,6 +49,15 @@ const MainFeature = ({ onAddChirp }) => {
     };
   }, [showEmojiPicker]);
   
+  // Effect to handle errors from Redux
+  useEffect(() => {
+    if (chirpError) {
+      toast.error("Failed to create chirp: " + chirpError);
+      // Set local loading state to false if it's still true
+      if (isLoading) setIsLoading(false);
+    }
+  }, [chirpError]);
+  
   const handleTextChange = (e) => {
     setChirpText(e.target.value);
   };
@@ -58,39 +72,44 @@ const MainFeature = ({ onAddChirp }) => {
       const user = JSON.parse(localStorage.getItem('user'));
       const chirpData = {
         Name: "New Chirp", // Matching exact field name in the database schema
-        content: chirpText,
+        content: chirpText.trim(),
         image: previewImage,
         username: user?.username || "user",
         display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
         likes: 0,
         rechirps: 0,
-        replies: 0,
+        replies: 0, 
         views: "0",
         is_liked: false,
         category: "technology"
       };
       
-      // Create chirp in database
-      try {
-        const newChirp = await chirpService.createChirp(chirpData);
+      console.log("Dispatching createChirp with data:", chirpData);
+      
+      // Use Redux to create the chirp
+      const resultAction = await dispatch(createChirp(chirpData));
+      
+      // Check if the action was fulfilled or rejected
+      if (createChirp.fulfilled.match(resultAction)) {
+        // Success - get the created chirp from the response
+        const newChirp = resultAction.payload;
         
-        if (newChirp) {
-          onAddChirp(newChirp);
-          toast.success("Your chirp has been posted!");
-          setChirpText('');
-          setPreviewImage(null);
-        } else {
-          throw new Error("No data returned from chirp creation");
-        }
-      } catch (error) {
-        console.error("Error in createChirp:", error);
-        toast.error(error.message || "Failed to create chirp");
+        // Update local state and notify success
+        console.log("Chirp created successfully:", newChirp);
+        onAddChirp(newChirp);
+        toast.success("Your chirp has been posted!");
+        
+        // Reset form
+        setChirpText('');
+        setPreviewImage(null);
+      } else {
+        // Handle errors from the thunk
+        const errorMsg = resultAction.payload || "Failed to create chirp";
+        toast.error("Failed to create chirp: " + errorMsg);
       }
       
-    } catch (error) {
-      toast.error("Failed to create chirp: " + (error.message || "Unknown error"));
-    } finally {
+      toast.error("Error creating chirp: " + (error.message || "Unknown error"));
       setIsLoading(false);
     }
   };
@@ -345,7 +364,7 @@ const MainFeature = ({ onAddChirp }) => {
                     className={`btn-primary py-1.5 px-4 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {isLoading ? (
-                      <LoaderIcon className="w-5 h-5 animate-spin" />
+                      <LoaderIcon className="w-5 h-5 animate-spin" aria-label="Loading" />
                     ) : (
                       "Chirp"
                     )}

@@ -196,7 +196,7 @@ function App() {
   };
   
   const handleAddChirp = (newChirp) => {
-    setChirps((prevChirps) => [newChirp, ...prevChirps]);
+    setChirps((prevChirps) => newChirp ? [newChirp, ...prevChirps] : prevChirps);
   };
 
   const MoonIcon = getIcon('Moon');
