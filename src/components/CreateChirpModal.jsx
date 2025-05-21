@@ -64,7 +64,13 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
   
   const handleSubmit = async () => {
     if (isDisabled) return;
-
+    
+    // Validate text content
+    if (!chirpText || chirpText.trim() === '') {
+      toast.error("Please enter some text for your chirp");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -72,9 +78,8 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       const user = JSON.parse(localStorage.getItem('user'));
       const chirpData = {
         Name: "New Chirp",
-        content: chirpText,
-        text: chirpText, // Include for compatibility
-        image: previewImage,
+        content: chirpText.trim(), // Ensure content is trimmed but preserved
+        image: previewImage || "",
         username: user?.username || "user",
         location: location ? location.display : "",
         display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
@@ -87,23 +92,29 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         verified: false,
         category: "technology"
       };
-      console.log("Created chirp:", newChirp);
+      
+      // Log before creating to verify data is correct
+      console.log("About to create chirp with content:", chirpData.content);
       
       // Create chirp in database
       const newChirp = await chirpService.createChirp(chirpData);
       
+      // Verify the returned chirp has the content we expected
       console.log("Created chirp:", newChirp);
-      onAddChirp({
-        content: chirpText,
-        text: chirpText,
-        timestamp: new Date().toISOString()
-      });
       
-      toast.success("Your chirp has been posted!");
-      setChirpText("");
-      setPreviewImage(null);
-      setLocation(null);
-      onClose();
+      if (newChirp) {
+        // Use the actual returned chirp data from the database to ensure consistency
+        onAddChirp(newChirp);
+        
+        toast.success("Your chirp has been posted!");
+        setChirpText("");
+        setPreviewImage(null);
+        setLocation(null);
+        onClose();
+      } else {
+        throw new Error("Chirp created but no data returned");
+      }
+      
     } catch (error) {
       console.error("Error creating chirp:", error);
       toast.error("Failed to create chirp: " + error.message);

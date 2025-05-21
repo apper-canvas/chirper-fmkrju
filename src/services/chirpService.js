@@ -76,8 +76,13 @@ const createChirp = async (chirpData) => {
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
 
-    // Log before formatting for debugging
-    console.log("Creating chirp with raw data:", chirpData);
+    // Log critical content field for debugging
+    console.log("Creating chirp with content:", chirpData.content);
+    
+    // CRITICAL: Validate content field exists and is not empty
+    if (!chirpData.content || chirpData.content.trim() === '') {
+      throw new Error("Cannot create chirp: content field is empty or missing");
+    }
 
     // CRITICAL: Make sure user input is prioritized and never replaced with defaults
     // unless the field is actually empty
@@ -86,7 +91,7 @@ const createChirp = async (chirpData) => {
       // Required Updateable fields from schema
       Name: chirpData.Name || "New Chirp", // Text
       Tags: chirpData.Tags || "", // Tag
-      content: chirpData.content || "", // MultilineText
+      content: chirpData.content, // MultilineText - NEVER default this field if provided
       image: chirpData.image || "", // Text
       username: chirpData.username || "", // Text
       display_name: chirpData.display_name || "", // Text
@@ -100,7 +105,7 @@ const createChirp = async (chirpData) => {
       category: chirpData.category || "technology" // Picklist
     };
     
-    // Extra validation for critical user content field - never default if provided
+    // Extra validation for critical user content field - log for debugging
     console.log("User content before submission:", chirpData.content);
     
     // Filter out any undefined values that could cause API errors
@@ -111,7 +116,11 @@ const createChirp = async (chirpData) => {
     });
 
     // Log the final formatted data after any transformations
-    console.log("Final formatted chirp data:", formattedChirpData);
+    console.log("Final formatted chirp data:", {
+      ...formattedChirpData,
+      // Explicitly log content to ensure it survived formatting
+      content: formattedChirpData.content
+    });
 
     // Prepare request payload with records array as expected by API
     const params = {

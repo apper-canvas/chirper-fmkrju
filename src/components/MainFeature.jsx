@@ -64,7 +64,13 @@ const MainFeature = ({ onAddChirp }) => {
   
   const handleSubmit = async () => {
     if (isDisabled) return;
-    
+
+    // Validate text content 
+    if (!chirpText || chirpText.trim() === '') {
+      toast.error("Please enter some text for your chirp");
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -77,7 +83,7 @@ const MainFeature = ({ onAddChirp }) => {
         Name: "Chirp " + new Date().toISOString().slice(0, 10), // Unique name with date
         Tags: "", // Empty tags by default
         content: chirpText.trim(),
-        image: previewImage,
+        image: previewImage || "",
         username: user?.username || user?.emailAddress?.split('@')[0] || "user",
         display_name: user?.firstName && user?.lastName ? 
                      `${user.firstName} ${user.lastName}` : 
@@ -93,7 +99,7 @@ const MainFeature = ({ onAddChirp }) => {
         category: "technology" // Using valid picklist value
       };
       
-      console.log("Dispatching createChirp with data:", chirpData);
+      console.log("Dispatching createChirp with content:", chirpData.content);
       
       // Use Redux to create the chirp
       const resultAction = await dispatch(createChirp(chirpData));
@@ -103,10 +109,13 @@ const MainFeature = ({ onAddChirp }) => {
         // Success - get the created chirp from the response
         const newChirp = resultAction.payload;
         
-        // Update local state and notify success
-        console.log("Chirp created successfully:", newChirp);
-        
-        // Make sure we're not passing null to the onAddChirp function
+        // Verify the returned chirp content matches what was sent
+        console.log("Chirp created successfully:", {
+          id: newChirp?.Id,
+          content: newChirp?.content
+        });
+
+        // Use the returned chirp data to update UI
         if (newChirp) {
           onAddChirp(newChirp);
         }
