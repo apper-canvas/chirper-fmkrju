@@ -69,7 +69,7 @@ const getChirpById = async (chirpId) => {
 
 const createChirp = async (chirpData) => {
   try {
-    // Initialize ApperClient with proper configuration
+    // Use the common apperService to initialize the client
     const { ApperClient } = window.ApperSDK;
     const apperClient = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
@@ -79,23 +79,32 @@ const createChirp = async (chirpData) => {
     // Log before formatting for debugging
     console.log("Creating chirp with raw data:", chirpData);
 
-    // Ensure proper formatting for boolean and numeric fields
+    // Format data according to the exact field names and types in the database schema
+    // Field names must match exactly what's in the tables and fields definition
     const formattedChirpData = {
-      Name: chirpData.Name || "New Chirp",
-      Tags: chirpData.tags || "",
-      content: chirpData.content || "",
-      image: chirpData.image || "",
-      username: chirpData.username || "",
-      display_name: chirpData.display_name || "",
-      avatar: chirpData.avatar || "",
-      verified: Boolean(chirpData.verified),
-      likes: parseInt(chirpData.likes || 0),
-      rechirps: parseInt(chirpData.rechirps || 0),
-      replies: parseInt(chirpData.replies || 0),
-      views: String(chirpData.views || "0"),
-      is_liked: Boolean(chirpData.is_liked),
-      category: chirpData.category || "technology"
+      // Required Updateable fields from schema
+      Name: chirpData.Name || "New Chirp", // Text
+      Tags: chirpData.Tags || "", // Tag
+      content: chirpData.content || "", // MultilineText
+      image: chirpData.image || "", // Text
+      username: chirpData.username || "", // Text
+      display_name: chirpData.display_name || "", // Text
+      avatar: chirpData.avatar || "", // Text
+      verified: !!chirpData.verified, // Boolean - ensure true/false
+      likes: Number(chirpData.likes || 0), // Number - ensure numeric
+      rechirps: Number(chirpData.rechirps || 0), // Number - ensure numeric
+      replies: Number(chirpData.replies || 0), // Number - ensure numeric
+      views: String(chirpData.views || "0"), // Text
+      is_liked: !!chirpData.is_liked, // Boolean - ensure true/false
+      category: chirpData.category || "technology" // Picklist
     };
+    
+    // Filter out any undefined values that could cause API errors
+    Object.keys(formattedChirpData).forEach(key => {
+      if (formattedChirpData[key] === undefined) {
+        delete formattedChirpData[key];
+      }
+    });
 
     // Prepare request payload with records array as expected by API
     const params = {
@@ -103,8 +112,8 @@ const createChirp = async (chirpData) => {
     };
 
     // Create the record in the database
-    console.log("Sending formatted data to Apper backend:", JSON.stringify(params, null, 2));
-    console.log("Table fields structure:", "chirp1");
+    console.log("Sending formatted data to Apper backend:", params);
+    console.log("Table name:", "chirp1");
 
     const response = await apperClient.createRecord("chirp1", params);
 
@@ -117,7 +126,7 @@ const createChirp = async (chirpData) => {
       throw new Error(result.message || "Failed to create chirp");
     }
 
-    console.log("Chirp created successfully. Response:", JSON.stringify(result.data));
+    console.log("Chirp created successfully. Response:", result.data);
     return result.data;
 
   } catch (error) {

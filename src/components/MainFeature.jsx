@@ -69,20 +69,28 @@ const MainFeature = ({ onAddChirp }) => {
     
     try {
       // Prepare chirp data
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem('user')) || {};
+      
+      // Format the chirp data according to the database schema requirements
       const chirpData = {
-        Name: "New Chirp", // Matching exact field name in the database schema
+        // Required fields matching exact database field names
+        Name: "Chirp " + new Date().toISOString().slice(0, 10), // Unique name with date
+        Tags: "", // Empty tags by default
         content: chirpText.trim(),
         image: previewImage,
-        username: user?.username || "user",
-        display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
-        likes: 0,
-        rechirps: 0,
-        replies: 0, 
-        views: "0",
-        is_liked: false,
-        category: "technology"
+        username: user?.username || user?.emailAddress?.split('@')[0] || "user",
+        display_name: user?.firstName && user?.lastName ? 
+                     `${user.firstName} ${user.lastName}` : 
+                     user?.displayName || "User Name",
+        avatar: user?.profileImage || 
+               "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        verified: false,
+        likes: 0, // Ensure this is a number
+        rechirps: 0, // Ensure this is a number
+        replies: 0, // Ensure this is a number
+        views: "0", // This is a Text field according to schema
+        is_liked: false, // Ensure this is a boolean
+        category: "technology" // Using valid picklist value
       };
       
       console.log("Dispatching createChirp with data:", chirpData);
@@ -97,7 +105,11 @@ const MainFeature = ({ onAddChirp }) => {
         
         // Update local state and notify success
         console.log("Chirp created successfully:", newChirp);
-        onAddChirp(newChirp);
+        
+        // Make sure we're not passing null to the onAddChirp function
+        if (newChirp) {
+          onAddChirp(newChirp);
+        }
         toast.success("Your chirp has been posted!");
         
         // Reset form
