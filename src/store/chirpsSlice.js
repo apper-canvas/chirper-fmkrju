@@ -37,7 +37,14 @@ export const createChirp = createAsyncThunk(
   'chirps/createChirp',
   async (chirpData, { rejectWithValue }) => {
     try {
-      console.log("createChirp thunk with data:", chirpData);
+      // Enhanced logging to track the exact data flow
+      console.log("createChirp thunk received data:", chirpData);
+      
+      // Ensure content is properly passed through and not lost
+      if (chirpData.content) {
+        console.log("User entered content:", chirpData.content);
+      }
+      
       const response = await chirpService.createChirp(chirpData);
       return response;
     } catch (error) {

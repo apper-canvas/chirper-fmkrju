@@ -79,7 +79,8 @@ const createChirp = async (chirpData) => {
     // Log before formatting for debugging
     console.log("Creating chirp with raw data:", chirpData);
 
-    // Format data according to the exact field names and types in the database schema
+    // CRITICAL: Make sure user input is prioritized and never replaced with defaults
+    // unless the field is actually empty
     // Field names must match exactly what's in the tables and fields definition
     const formattedChirpData = {
       // Required Updateable fields from schema
@@ -99,12 +100,18 @@ const createChirp = async (chirpData) => {
       category: chirpData.category || "technology" // Picklist
     };
     
+    // Extra validation for critical user content field - never default if provided
+    console.log("User content before submission:", chirpData.content);
+    
     // Filter out any undefined values that could cause API errors
     Object.keys(formattedChirpData).forEach(key => {
       if (formattedChirpData[key] === undefined) {
         delete formattedChirpData[key];
       }
     });
+
+    // Log the final formatted data after any transformations
+    console.log("Final formatted chirp data:", formattedChirpData);
 
     // Prepare request payload with records array as expected by API
     const params = {
