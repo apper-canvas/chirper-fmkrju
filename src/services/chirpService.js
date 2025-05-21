@@ -69,44 +69,46 @@ const getChirpById = async (chirpId) => {
 
 const createChirp = async (chirpData) => {
   try {
+    // Initialize ApperClient
     const { ApperClient } = window.ApperSDK;
-    const apperClient = new ApperClient({ 
-      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
+    const apperClient = new ApperClient({
+       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+     });
 
     // Only include Updateable fields
     const params = {
       records: [{
-        Name: chirpData.name || "New Chirp",
-        Tags: chirpData.tags || "",
-        content: chirpData.content || chirpData.text || "",
-        image: chirpData.image || "",
-        username: chirpData.username || "",
-        display_name: chirpData.display_name || "",
-        avatar: chirpData.avatar || "",
-        verified: chirpData.verified || false,
-        likes: chirpData.likes || 0,
-        rechirps: chirpData.rechirps || 0,
-        replies: chirpData.replies || 0,
-        views: chirpData.views || "0",
-        is_liked: chirpData.is_liked || false,
-    
+         Name: chirpData.name || "New Chirp",
+         Tags: chirpData.tags || "",
+         content: chirpData.content || chirpData.text || "",
+         image: chirpData.image || "",
+         username: chirpData.username || "",
+         display_name: chirpData.display_name || "",
+         avatar: chirpData.avatar || "",
+         verified: chirpData.verified || false,
+         likes: chirpData.likes || 0,
+         rechirps: chirpData.rechirps || 0,
+         replies: chirpData.replies || 0,
+         views: chirpData.views || "0",
+         is_liked: chirpData.is_liked || false,
+         category: chirpData.category || "technology"
+       }]
+     };
+
+    // Create the record in the database
     const response = await apperClient.createRecord("chirp1", params);
-    
+
     if (!response || !response.results || response.results.length === 0) {
       throw new Error("No response data returned when creating chirp");
-    } catch (error) {
-    
+    }
+
     const result = response.results[0];
     if (!result.success) {
       throw new Error(result.message || "Failed to create chirp");
     }
-    
+
     return result.data;
-      console.error("Error creating chirp:", error);
-    console.error("Error creating chirp:", error);
-    throw new Error(`Failed to create chirp: ${error.message || "Unknown error"}`);
   } catch (error) {
     console.error("Error in chirp service:", error);
     throw error;
