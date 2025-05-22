@@ -19,28 +19,48 @@ const ChirpList = ({ chirps, isLoading, error }) => {
   const LoaderIcon = getIcon('Loader2');
   
   const formatChirpTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
+    try {
+      // Return empty string if timestamp is undefined or null
+      if (!timestamp) return '';
+      
+      // Try to parse the timestamp into a Date object
+      const date = new Date(timestamp);
+      
+      // Check if date is valid before proceeding
+      if (isNaN(date.getTime())) return '';
+      
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
     
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds}s`;
-    } else if (diffInSeconds < 3600) {
-      return `${Math.floor(diffInSeconds / 60)}m`;
-    } else if (diffInSeconds < 86400) {
-      return `${Math.floor(diffInSeconds / 3600)}h`;
-    } else {
-      return format(date, 'MMM d');
+      if (diffInSeconds < 60) {
+        return `${diffInSeconds}s`;
+      } else if (diffInSeconds < 3600) {
+        return `${Math.floor(diffInSeconds / 60)}m`;
+      } else if (diffInSeconds < 86400) {
+        return `${Math.floor(diffInSeconds / 3600)}h`;
+      } else {
+        return format(date, 'MMM d');
+      }
+    } catch (e) {
+      console.error("Error formatting chirp time:", e);
+      return '';
     }
   };
   
   const handleSaveChirp = async (chirp) => {
     try {
       // First try to save using the service
-      await savedItemService.saveItem({ chirpId: chirp.Id });
+      // Make sure we have a valid ID to save
+      const chirpId = chirp?.Id;
+      
+      if (!chirpId) {
+        throw new Error("Cannot save chirp: missing ID");
+      }
+      
+      await savedItemService.saveItem({ chirpId });
       
       // If successful, update Redux state
-      dispatch(saveItemAction({ chirpId: chirp.Id }));
+      dispatch(saveItemAction({ chirpId }));
       
       // Show success message
       toast.success('Chirp saved to bookmarks');
@@ -55,7 +75,7 @@ const ChirpList = ({ chirps, isLoading, error }) => {
     }
   };
   
-  if (isLoading && chirps.length === 0) {
+  if (isLoading && (!chirps || chirps.length === 0)) {
     return (
       <div className="flex justify-center items-center p-6">
         <LoaderIcon className="w-8 h-8 animate-spin text-primary" />
@@ -63,7 +83,7 @@ const ChirpList = ({ chirps, isLoading, error }) => {
     );
   }
   
-  if (error && chirps.length === 0) {
+  if (error && (!chirps || chirps.length === 0)) {
     return (
       <div className="text-center p-6 text-red-500">
         <p>Error loading chirps: {error}</p>
@@ -71,7 +91,7 @@ const ChirpList = ({ chirps, isLoading, error }) => {
     );
   }
   
-  if (chirps.length === 0) {
+  if (!chirps || chirps.length === 0) {
     return (
       <div className="text-center p-6 text-surface-500">
         <p>No chirps to display</p>
@@ -81,22 +101,22 @@ const ChirpList = ({ chirps, isLoading, error }) => {
   
   return (
     <div className="divide-y divide-surface-200 dark:divide-surface-700">
-      {chirps.map(chirp => (
-        <article key={chirp.Id} className="p-4 hover:bg-surface-100 dark:hover:bg-surface-800/50 transition-colors">
+      {chirps.map((chirp, index) => (
+        <article key={chirp?.Id || index} className="p-4 hover:bg-surface-100 dark:hover:bg-surface-800/50 transition-colors">
           <div className="flex">
             <img 
-              src={chirp.avatar || `https://i.pravatar.cc/48?img=${chirp.Id}`} 
-              alt={chirp.display_name} 
+              src={chirp?.avatar || `https://i.pravatar.cc/48?img=${index + 1}`} 
+              alt={chirp?.display_name || 'User avatar'} 
               className="w-12 h-12 rounded-full object-cover mr-3 flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
                 <div className="flex items-center">
-                  <h3 className="font-bold text-base hover:underline truncate mr-1">{chirp.display_name}</h3>
-                  {chirp.verified && (
+                  <h3 className="font-bold text-base hover:underline truncate mr-1">{chirp?.display_name || 'Anonymous'}</h3>
+                  {chirp?.verified && (
                     <VerifiedIcon className="w-4 h-4 text-primary flex-shrink-0" />
                   )}
-                  <span className="text-surface-500 text-sm ml-1 truncate">@{chirp.username} · {formatChirpTime(chirp.CreatedOn)}</span>
+                  <span className="text-surface-500 text-sm ml-1 truncate">@{chirp?.username || 'user'} · {formatChirpTime(chirp?.CreatedOn)}</span>
                 </div>
                 <div className="flex">
                   <button 
@@ -112,9 +132,9 @@ const ChirpList = ({ chirps, isLoading, error }) => {
                 </div>
               </div>
               
-              <p className="mt-1 mb-2 text-[15px] text-balance">{chirp.content}</p>
+              <p className="mt-1 mb-2 text-[15px] text-balance">{chirp?.content || ''}</p>
               
-              {chirp.image && (
+              {chirp?.image && (
                 <div className="mt-2 mb-3 rounded-2xl overflow-hidden">
                   <img 
                     src={chirp.image} 
@@ -129,21 +149,21 @@ const ChirpList = ({ chirps, isLoading, error }) => {
                   <div className="p-2 rounded-full group-hover:bg-primary/10">
                     <MessageSquareIcon className="w-5 h-5" />
                   </div>
-                  <span className="text-sm ml-1">{chirp.replies}</span>
+                  <span className="text-sm ml-1">{chirp?.replies || 0}</span>
                 </button>
                 
                 <button className="flex items-center text-surface-500 hover:text-green-500 group">
                   <div className="p-2 rounded-full group-hover:bg-green-500/10">
                     <RepeatIcon className="w-5 h-5" />
                   </div>
-                  <span className="text-sm ml-1">{chirp.rechirps}</span>
+                  <span className="text-sm ml-1">{chirp?.rechirps || 0}</span>
                 </button>
                 
                 <button className="flex items-center text-surface-500 hover:text-accent group">
                   <div className="p-2 rounded-full group-hover:bg-accent/10">
-                    <HeartIcon className="w-5 h-5" fill={chirp.is_liked ? "currentColor" : "none"} />
+                    <HeartIcon className="w-5 h-5" fill={chirp?.is_liked ? "currentColor" : "none"} />
                   </div>
-                  <span className="text-sm ml-1">{chirp.likes}</span>
+                  <span className="text-sm ml-1">{chirp?.likes || 0}</span>
                 </button>
               </div>
             </div>
