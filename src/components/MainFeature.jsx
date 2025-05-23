@@ -76,30 +76,31 @@ const MainFeature = ({ onAddChirp }) => {
     try {
       // Prepare chirp data
       const user = JSON.parse(localStorage.getItem('user')) || {};
+
+      // Extract user information for the chirp
+      const username = user?.username || user?.emailAddress?.split('@')[0] || "user";
+      const displayName = user?.firstName && user?.lastName 
+                        ? `${user.firstName} ${user.lastName}` 
+                        : user?.displayName || "User";
       
       // Format the chirp data according to the database schema requirements
       const chirpData = {
         // Required fields matching exact database field names
-        Name: "Chirp " + new Date().toISOString().slice(0, 10), // Unique name with date
-        Tags: "", // Empty tags by default
-        content: chirpText.trim(),
+        Name: `Chirp from ${displayName} - ${new Date().toISOString()}`,
+        Tags: "",
+        content: chirpText.trim(), // The most important field - user's message
         image: previewImage || "",
-        username: user?.username || user?.emailAddress?.split('@')[0] || "user",
-        display_name: user?.firstName && user?.lastName ? 
-                     `${user.firstName} ${user.lastName}` : 
-                     user?.displayName || "User Name",
-        avatar: user?.profileImage || 
-               "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        username: username,
+        display_name: displayName,
+        avatar: user?.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
         verified: false,
-        likes: 0, // Ensure this is a number
-        rechirps: 0, // Ensure this is a number
-        replies: 0, // Ensure this is a number
-        views: "0", // This is a Text field according to schema
-        is_liked: false, // Ensure this is a boolean
-        category: "technology" // Using valid picklist value
+        likes: 0,
+        rechirps: 0,
+        replies: 0,
+        views: "0",
+        is_liked: false,
+        category: "technology"
       };
-      
-      console.log("Dispatching createChirp with content:", chirpData.content);
       
       // Use Redux to create the chirp
       const resultAction = await dispatch(createChirp(chirpData));
@@ -110,14 +111,13 @@ const MainFeature = ({ onAddChirp }) => {
         const newChirp = resultAction.payload;
         
         // Verify the returned chirp content matches what was sent
-        console.log("Chirp created successfully:", {
-          id: newChirp?.Id,
-          content: newChirp?.content
-        });
-
-        // Use the returned chirp data to update UI
-        if (newChirp) {
+        if (newChirp && newChirp.content) {
+          console.log("Chirp created successfully with content:", newChirp.content);
+          
+          // Use the returned chirp data to update UI
           onAddChirp(newChirp);
+        } else {
+          console.error("Chirp created but content is missing:", newChirp);
         }
         toast.success("Your chirp has been posted!");
         
@@ -132,6 +132,7 @@ const MainFeature = ({ onAddChirp }) => {
       
       setIsLoading(false);
     } catch (error) {
+      console.error("Failed chirp content:", chirpText);
       toast.error("Error creating chirp: " + (error.message || "Unknown error"));
       setIsLoading(false);
     }

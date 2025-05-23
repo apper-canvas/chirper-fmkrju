@@ -67,61 +67,45 @@ const getChirpById = async (chirpId) => {
   }
 };
 
-const createChirp = async (chirpData) => {
+const createChirp = async (chirpData = {}) => {
   try {
-    // Use the common apperService to initialize the client
+    // Initialize ApperClient
     const { ApperClient } = window.ApperSDK;
     const apperClient = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
 
-    // Log critical content field for debugging
-    console.log("Creating chirp with content:", chirpData.content);
-    
     // CRITICAL: Validate content field exists and is not empty
     if (!chirpData.content || chirpData.content.trim() === '') {
       throw new Error("Cannot create chirp: content field is empty or missing");
     }
 
-    // CRITICAL: Make sure user input is prioritized and never replaced with defaults
-    // unless the field is actually empty
+    // Get user information for chirp metadata
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    
     // Field names must match exactly what's in the tables and fields definition
     const formattedChirpData = {
-      // Required Updateable fields from schema
-      Name: chirpData.Name || "New Chirp", // Text
+      // Essential fields with proper types
+      Name: chirpData.Name || `Chirp from ${user.firstName || 'User'} - ${new Date().toISOString()}`, // Text
       Tags: chirpData.Tags || "", // Tag
-      content: chirpData.content, // MultilineText - NEVER default this field if provided
+      content: chirpData.content.trim(), // MultilineText - critical user content
       image: chirpData.image || "", // Text
-      username: chirpData.username || "", // Text
-      display_name: chirpData.display_name || "", // Text
-      avatar: chirpData.avatar || "", // Text
-      verified: !!chirpData.verified, // Boolean - ensure true/false
-      likes: Number(chirpData.likes || 0), // Number - ensure numeric
-      rechirps: Number(chirpData.rechirps || 0), // Number - ensure numeric
-      replies: Number(chirpData.replies || 0), // Number - ensure numeric
-      views: String(chirpData.views || "0"), // Text
-      is_liked: !!chirpData.is_liked, // Boolean - ensure true/false
-      category: chirpData.category || "technology" // Picklist
+      username: chirpData.username || user.emailAddress?.split('@')[0] || "user", // Text
+      display_name: chirpData.display_name || 
+                   (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 
+                   user.displayName || "User"), // Text
+      avatar: chirpData.avatar || user.profileImage || 
+              "https://images.unsplash.com/photo-1534528741775-53994a69daeb", // Text
+      verified: false, // Boolean
+      likes: 0, // Number
+      rechirps: 0, // Number
+      replies: 0, // Number
+      views: "0", // Text - as specified in schema
+      is_liked: false, // Boolean
+      category: chirpData.category || "technology" // Picklist with valid value
     };
     
-    // Extra validation for critical user content field - log for debugging
-    console.log("User content before submission:", chirpData.content);
-    
-    // Filter out any undefined values that could cause API errors
-    Object.keys(formattedChirpData).forEach(key => {
-      if (formattedChirpData[key] === undefined) {
-        delete formattedChirpData[key];
-      }
-    });
-
-    // Log the final formatted data after any transformations
-    console.log("Final formatted chirp data:", {
-      ...formattedChirpData,
-      // Explicitly log content to ensure it survived formatting
-      content: formattedChirpData.content
-    });
-
     // Prepare request payload with records array as expected by API
     const params = {
       records: [formattedChirpData] 
@@ -129,9 +113,8 @@ const createChirp = async (chirpData) => {
 
     // Create the record in the database
     console.log("Sending formatted data to Apper backend:", params);
-    console.log("Table name:", "chirp1");
 
-    const response = await apperClient.createRecord("chirp1", params);
+    const response = await apperClient.createRecord("chirp1", params); 
 
     if (!response || !response.results || response.results.length === 0) {
       throw new Error("No response data returned when creating chirp");
@@ -146,7 +129,6 @@ const createChirp = async (chirpData) => {
     return result.data;
 
   } catch (error) {
-    console.error("Error creating chirp in service:", error.message);
     console.error("Full error:", error);
     throw error;
   }

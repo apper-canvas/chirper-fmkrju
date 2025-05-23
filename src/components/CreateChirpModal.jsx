@@ -76,20 +76,28 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
     try {
       // Prepare chirp data
       const user = JSON.parse(localStorage.getItem('user'));
+      
+      // Ensure we have proper user information
+      const username = user?.username || user?.emailAddress?.split('@')[0] || "user";
+      const displayName = user?.firstName && user?.lastName 
+                        ? `${user.firstName} ${user.lastName}` 
+                        : user?.displayName || "User";
+      
+      // Format the chirp data according to the database schema
       const chirpData = {
-        Name: "New Chirp",
-        content: chirpText.trim(), // Ensure content is trimmed but preserved
+        Name: `Chirp from ${displayName} - ${new Date().toISOString()}`,
+        Tags: "",
+        content: chirpText.trim(), // This is the most important field - user's input
         image: previewImage || "",
-        username: user?.username || "user",
-        location: location ? location.display : "",
-        display_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User Name",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        username: username,
+        display_name: displayName,
+        avatar: user?.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+        verified: false,
         likes: 0,
         rechirps: 0,
         replies: 0,
         views: "0",
-        is_liked: false, 
-        verified: false,
+        is_liked: false,
         category: "technology"
       };
       
@@ -102,9 +110,11 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
       // Verify the returned chirp has the content we expected
       console.log("Created chirp:", newChirp);
       
-      if (newChirp) {
+      if (newChirp && newChirp.content) {
         // Use the actual returned chirp data from the database to ensure consistency
         onAddChirp(newChirp);
+        // Also add the chirp to the local state if needed
+        console.log("Successfully added chirp with content:", newChirp.content);
         
         toast.success("Your chirp has been posted!");
         setChirpText("");
@@ -112,11 +122,12 @@ const CreateChirpModal = ({ isOpen, onClose, onAddChirp }) => {
         setLocation(null);
         onClose();
       } else {
-        throw new Error("Chirp created but no data returned");
+        throw new Error("Chirp created but content is missing in response");
       }
       
     } catch (error) {
       console.error("Error creating chirp:", error);
+      console.error("Failed chirp content:", chirpText);
       toast.error("Failed to create chirp: " + error.message);
     } finally {
       setIsLoading(false);
